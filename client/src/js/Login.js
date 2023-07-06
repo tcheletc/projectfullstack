@@ -38,7 +38,7 @@ function Login() {
         <div className="register-link">
         אין לך חשבון? <Link to="/register">הירשם</Link>
       </div >
-        <button type="submit">{loading ? 'טוען...' : 'התחברות'}</button> {/* Update button text based on loading state */}
+        <button type="submit">{loading ? '...טוען' : 'התחברות'}</button> {/* Update button text based on loading state */}
       </form>
      
     </div>

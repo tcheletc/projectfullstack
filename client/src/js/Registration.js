@@ -19,7 +19,7 @@ function Registration() {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      alert('Password and Confirm Password must match');
+      alert('הסיסמא לא תואמת לאימות שלה');
       return;
     }
 
@@ -63,13 +63,13 @@ function Registration() {
           type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          placeholder="אמת סיסמא"
+          placeholder="אימות סיסמא"
           required
         />
         <div className="register-link">
         כבר יש לך חשבון? <Link to="/login">התחברות</Link>
         </div>
-        <button type="submit">{loading ? 'טוען...' : 'הירשם'}</button>
+        <button type="submit">{loading ? '...טוען' : 'הירשם'}</button>
       </form>
     </div>
   );
