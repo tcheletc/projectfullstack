@@ -46,16 +46,16 @@ router.post('/', (req, res) => {
   const userValuesClause = userValues.map(v => '?').join(', ');
   const userQuery = `INSERT INTO users (${userKeys.join(', ')}) VALUES (${userValuesClause})`;
 
-  const passKeys = ['password_'];
-  const passValues = [req.body.password_];
-  const passValuesClause = passValues.map(v => '?').join(', ');
+  const passKeys = ['id', 'password_'];
+  const passValue = req.body.password_;
+  const passValuesClause = passKeys.map(v => '?').join(', ');
   const passQuery = `INSERT INTO passwords (${passKeys.join(', ')}) VALUES (${passValuesClause})`;
 
   executeQuery(userQuery, userValues, (error, results) => {
     if (error) {
       res.status(500).json({ error });
     } else {
-      executeQuery(passQuery, passValues, (error, results) => {
+      executeQuery(passQuery, [results.insertId, passValue], (error, result) => {
         if (error) {
           res.status(500).json({ error });
         } else {

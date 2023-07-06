@@ -43,7 +43,7 @@ function Registration() {
     <div className="login">
       <form className="login-form registration-form" onSubmit={handleSubmit}>
         <input dir='rtl' type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="שם מלא" required />
-        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="שם משתמש" required />
+        <input type="text" pattern='[a-zA-Z]([A-Za-z0-9])*' value={username} onChange={(e) => setUsername(e.target.value)} placeholder="שם משתמש" required />
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="דואר אלקטוני" required />
         <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="טלפון נייד" required />
         <div className="password-input">
