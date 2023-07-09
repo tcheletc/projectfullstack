@@ -4,6 +4,7 @@ import Login from "../src/js/Login.js";
 import Main from "../src/js/Main.js";
 import Register from "./js/Registration";
 import { BrowserRouter, Route, Routes } from "react-router-dom"
+import Whatsapp from './js/Whatsapp';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
           <Route path="/" element={<Main />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/users/:username" element={<Whatsapp />} />
           <Route path="*" element={<NoPage />} />
       </Routes>
     </BrowserRouter>
