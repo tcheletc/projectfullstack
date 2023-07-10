@@ -6,9 +6,11 @@ const fetchServer = (url, callback, method = 'GET', headers= {}, body = {}) => {
             .then(result => callback(result, null, res.status))
             .catch(error => callback(null, error, res.status));
         } else {
-            res.text()
+            res.json()
             .then(err => callback(null, err, res.status))
-            .catch(error => callback(null, error, res.status));
+            .catch(error => res.text()
+                            .then(err => callback(null, error, res.status))
+                );
         }
     });
 }

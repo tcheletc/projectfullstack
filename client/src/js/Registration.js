@@ -13,13 +13,14 @@ function Registration() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false); // Track the visibility state of the password
   const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState('');
   const history = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      alert('הסיסמא לא תואמת לאימות שלה');
+      setErr('הסיסמא לא תואמת לאימות שלה');
       return;
     }
 
@@ -27,8 +28,14 @@ function Registration() {
 
     fetchServer('/users',
     (res, err, status) => {
-        if(err) alert(`Error${status}: Registration failed: ${err}`);
-        else history('/login');
+        if(err) {
+          if(err.error?.code === 'ER_DUP_ENTRY')
+            setErr('שם המשתמש כבר קיים במערכת');
+          else setErr(`שגיאה${status}: ההרשמה נכשלה: ${err.error?.code || err.error || err}`);
+        } else {
+          setErr('');
+          history('/login');
+        }
         setLoading(false);
     }, 'POST', { 'Content-Type': 'application/json'}, 
         JSON.stringify({ fullname: name, username, email, phone, password_ : password })
@@ -69,7 +76,8 @@ function Registration() {
         <div className="register-link">
         כבר יש לך חשבון? <Link to="/login">התחברות</Link>
         </div>
-        <button type="submit">{loading ? '...טוען' : 'הירשם'}</button>
+        <button type="submit">{loading ? '...טוען' : 'הרשמה'}</button>
+        <span className='alert'>{err}</span>
       </form>
     </div>
   );

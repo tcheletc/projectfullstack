@@ -92,6 +92,7 @@
   }
 
   .alert {
+    direction: rtl;
     font-size: x-small;
     color: red;
   }
