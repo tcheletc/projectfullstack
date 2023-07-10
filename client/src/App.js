@@ -1,4 +1,3 @@
-import './App.css';
 import NoPage from './js/NoPage';
 import Login from "../src/js/Login.js";
 import Main from "../src/js/Main.js";

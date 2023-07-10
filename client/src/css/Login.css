@@ -90,3 +90,8 @@
     width: 100%;
     box-sizing: border-box;
   }
+
+  .alert {
+    font-size: x-small;
+    color: red;
+  }

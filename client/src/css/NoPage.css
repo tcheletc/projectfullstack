@@ -21,3 +21,13 @@
     font-weight: bold;
     margin: 0;
 }
+
+@media only screen and (max-width: 500px) {
+    .nopage h1 {
+        font-size: 100px;
+    }
+
+    .nopage h2 {
+        font-size: 25px;
+    }
+}
