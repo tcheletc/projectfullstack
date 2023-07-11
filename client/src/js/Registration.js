@@ -37,8 +37,9 @@ function Registration() {
           history('/login');
         }
         setLoading(false);
-    }, 'POST', { 'Content-Type': 'application/json'}, 
-        JSON.stringify({ fullname: name, username, email, phone, password_ : password })
+    }, 'POST', 
+        JSON.stringify({ fullname: name, username, email, phone, password_ : password }),
+        { 'Content-Type': 'application/json'} 
     );
   };    
 

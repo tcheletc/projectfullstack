@@ -85,7 +85,7 @@ const createObject = (body, res, tableName, schema, objectType) => {
     const { error } = schema.validate(body);
   
     if (error) {
-      res.status(400).send(error.details[0].message);
+      res.status(400).json({error: error.details[0].message});
       return;
     }
   

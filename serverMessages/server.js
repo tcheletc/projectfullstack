@@ -6,7 +6,7 @@ const cors = require('cors');
 
 app.use(cors());
 
-const port = 6000;
+const port = 4000;
 
 const server = http.createServer(app);
 
@@ -33,6 +33,6 @@ io.on('connection', socket => {
     });
 })
 
-server.listen(() => {
+server.listen(port, () => {
     console.log(`Server is listening on port ${port}`);
 });

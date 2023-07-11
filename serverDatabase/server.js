@@ -1,13 +1,19 @@
 const express = require('express');
 const cors = require('cors');
-var usersRouter = require('./routes/users');
+const usersRouter = require('./routes/users');
+const groupsRouter = require('./routes/groups');
+const chatsRouter = require('./routes/chats');
+const messagesRouter = require('./routes/messages');
 
 const app = express();
 app.use(express.json());
 const port = process.env.PORT || 9000;
 
 app.use(cors());
-app.use('/api/users', usersRouter);
+app.use('/users', usersRouter);
+app.use('/groups', groupsRouter);
+app.use('/chats', chatsRouter);
+app.use('/messages', messagesRouter);
 
   
 // Start the server
