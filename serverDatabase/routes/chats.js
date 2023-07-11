@@ -8,7 +8,8 @@ router.get('/', (req, res) => {
         userId: Joi.number().min(1),
         partnerId: Joi.number().min(1),
         groupId: Joi.number().min(1),
-        limit: Joi.number().min(1)
+        limit: Joi.number().min(1),
+        offset: Joi.number().min(1)
     });
     getAllObjects(res, 'chats', req.query, schema);
 });
@@ -27,7 +28,7 @@ router.post('/', (req, res) => {
     createObject(req.body, res, 'chats', schema, 'Chat');
 });
 
-router.delete(':/chatId', (req, res) => {
+router.delete('/:chatId', (req, res) => {
     const { chatId } = req.params;
     deleteObjectById(chatId, res, 'chats', 'Chat');
 });

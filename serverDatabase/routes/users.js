@@ -11,7 +11,8 @@ router.get('/', (req, res) => {
       username: Joi.string().min(1),
       email: Joi.string().email(),
       phone: myCustomJoi.string().phoneNumber(),
-      limit: Joi.number().min(1)
+      limit: Joi.number().min(1),
+      offset: Joi.number().min(1)
   });
 
   getAllObjects(res, 'users', req.query, schema);

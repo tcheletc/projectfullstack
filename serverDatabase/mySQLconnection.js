@@ -39,7 +39,8 @@ const getAllObjects = (res, tableName, userQuery, schema) => {
         return;
         }
         let wheres = userQuery;
-        if (wheres.limit) wheres = Object.fromEntries(Object.entries(wheres).filter(([key]) => key != 'limit'));
+        if (wheres.limit || wheres.offset) wheres = Object.fromEntries(
+          Object.entries(wheres).filter(([key]) => key != 'limit'&&key != 'offset'&&key != 'reverse'));
         if(Object.keys(wheres).length > 0) {
             const whereClause = Object.keys(wheres).map(field => `${field} = ?`).join(' and ');
             values = Object.values(wheres);
@@ -47,8 +48,16 @@ const getAllObjects = (res, tableName, userQuery, schema) => {
         }
     }
 
+    if(userQuery.reverse) {
+      query += ` ORDER BY id DESC`
+    }
+
     if (userQuery.limit) {
         query += ` LIMIT ${userQuery.limit}`
+    }
+
+    if(userQuery.offset) {
+      query += ` OFFSET ${userQuery.offset}`
     }
 
     executeQuery(query, values, (error, results) => {

@@ -1,0 +1,33 @@
+.nav-chats {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    border-left: 1px solid rgb(210, 233, 243);
+}
+
+.chat-links {
+    border-top: 1px solid rgb(234, 239, 241);
+}
+
+.search {
+    padding: 10px;
+}
+
+.search .input-search {
+    border-radius: 5px;
+    background-color: rgb(234, 239, 241);
+    border: none;
+    padding: 10px;
+    display: flex;
+    gap: 5px;
+}
+
+.input-search input {
+    background-color: rgb(234, 239, 241);
+    border: none;
+    flex: 1;
+}
+
+.input-search input:focus {
+    outline: none;
+}

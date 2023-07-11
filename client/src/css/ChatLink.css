@@ -1,0 +1,14 @@
+.chat-link {
+    background-color: white;
+    border-bottom: 1px solid rgb(234, 239, 241);
+    padding: 10px;
+    cursor: pointer;
+}
+
+.chat-link:hover {
+    background-color: rgb(243, 245, 245);
+}
+
+.chat-link.selected {
+    border-left: 3px solid skyblue;
+}

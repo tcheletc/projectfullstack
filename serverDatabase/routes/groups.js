@@ -8,7 +8,8 @@ router.get('/', (req, res) => {
         userId: Joi.number().min(1),
         name_: Joi.string().min(1),
         is_admin: Joi.boolean(),
-        limit: Joi.number().min(1)
+        limit: Joi.number().min(1),
+        offset: Joi.number().min(1)
     });
     getAllObjects(res, 'groups_ join users_groups on id=groupId', req.query, schema);
 });

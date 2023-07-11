@@ -20,15 +20,15 @@ function Login() {
             if(status === 404)
               setErr(`שם המשתמש ו/או הסיסמא אינם נכונים`);
             else
-              setErr(`שגיאה${status}: ההתחברות נכשלה`);
+              setErr(`שגיאה${status||''}: ההתחברות נכשלה`);
           } else {
             setErr('');
             localStorage.setItem('user', JSON.stringify(user));
             history(`/users/${user.username}`);
           }
           setLoading(false);
-      }, 'POST', { 'Content-Type': 'application/json'}, 
-      JSON.stringify({ username, password_ : password })
+      }, 'POST', JSON.stringify({ username, password_ : password }),
+      { 'Content-Type': 'application/json'}
     );
   };
   

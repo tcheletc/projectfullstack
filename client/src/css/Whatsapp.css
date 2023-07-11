@@ -1,0 +1,6 @@
+.whatsapp {
+    display: flex;
+    height: 100vh;
+    direction: rtl;
+    margin: 0;
+}
