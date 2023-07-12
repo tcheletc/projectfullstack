@@ -21,6 +21,7 @@ io.on('connection', socket => {
     console.log(`User connection: ${socket.id}`);
     
     socket.on('send_message', (message, room) => {
+        console.log('send message to ' + room);
         socket.to(room).emit('receive_message', message);
     });
 

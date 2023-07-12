@@ -1,7 +1,7 @@
 .nav-chats {
     display: flex;
     flex-direction: column;
-    width: 300px;
+    width: 310px;
     border-left: 1px solid rgb(210, 233, 243);
 }
 

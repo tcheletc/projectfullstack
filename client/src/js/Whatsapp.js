@@ -15,8 +15,17 @@ function Whatsapp() {
     const [chats, setChats] = useState([]);
     const [selectedChatId, setSelectedChatId] = useState(null);
 
+    const addMessageToChat = (message, chatId) => {
+        setChats(chats => chats.map(chat => chat.id === chatId? 
+            {...chat, messages: chat.messages.concat([message])}: chat));
+    }
+
+    const addChat = (chat) => {
+        setChats(chats => chats.concat([chat]));
+    }
+
     useEffect(() => {
-        const userString = localStorage.getItem("user");
+        const userString = sessionStorage.getItem("user");
         if(!userString) {
             navigate('/login');
             return;
@@ -42,7 +51,7 @@ function Whatsapp() {
             if(error) {
                 alert(`שגיאה${status}: הבאת צ'אטים של המשתמש נכשלה`);
             } else {
-                setChats(result.map(chat => { return {...chat, messages: []}
+                setChats(result.map(chat => { return {...chat, messages: [], allMessages: false}
                 }));
                 console.log(result);
                 result.forEach(chat => {
@@ -62,22 +71,19 @@ function Whatsapp() {
         });
         socket.emit('join_room', user.id);
         socket.on('receive_message', message => {
-            //TODO: change
-            alert(message);
+            //TO-DO: add code for other options
+            if(!message.groupId) {
+                if(chats.some(chat => chat.partnerId === message.senderId)) {
+                    let chat = chats.find(chat => chat.partnerId === message.senderId);
+                    addMessageToChat({...message, chatId: chat.id}, chat.id);
+                }
+            }
+            //alert(message);
         });
     }, [username, navigate]);
 
-    const addChat = (chat) => {
-        setChats(chats => chats.concat([chat]));
-    }
-
     const deleteChat = (chatId) => {
         setChats(chats => chats.filter(chat => chat.id !== chatId));
-    }
-
-    const addMessageToChat = (message, chatId) => {
-        setChats(chats => chats.map(chat => chat.id === chatId? 
-            {...chat, messages: chat.messages.concat([message])}: chat));
     }
     
     const setMessagesInChat = (messages, chatId) => {
@@ -85,9 +91,23 @@ function Whatsapp() {
             {...chat, messages}: chat));
     }
 
-    const sendMessageFromUser = (room, message) => {
-        socket.emit('send_message', room, message);
+    const changeMessageInChat = (messageId, chatId, props) => {
+        setChats(chats => chats.map(chat => chat.id === chatId? 
+            {...chat, 
+                messages: chat.messages.map(message => message.id === messageId? 
+                    {...message, props}: message)} : chat));
     }
+    const setAllMessagesInChat  = (allMessages, chatId) => {
+        setChats(chats => chats.map(chat => chat.id === chatId? 
+            {...chat, allMessages}: chat));
+    }
+
+    const sendMessageFromUser = (message) => {
+        let chat = chats.find(chat => chat.id === selectedChatId)
+        let room = chat.partnerId||`group${chat.groupId}`
+        socket.emit('send_message', message, room);
+    }
+
 
     return (
         <div className='whatsapp'>
@@ -101,7 +121,9 @@ function Whatsapp() {
             userId={user.id}
             addToDisplay={(message) => addMessageToChat(message, selectedChatId)}
             display={(messages) => setMessagesInChat(messages, selectedChatId)}
-            sendMessage={(messsage) => sendMessageFromUser(user.partnerId||`group${user.groupId}`, messsage)} />
+            setAllMessages={(allMessages) => setAllMessagesInChat(allMessages, selectedChatId)}
+            updateMessage={(messageId, props) => changeMessageInChat(messageId, selectedChatId, props)}
+            sendMessage={sendMessageFromUser} />
         </div>
     );
 }

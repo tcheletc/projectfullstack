@@ -1,43 +1,91 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Message from "./Message";
 import fetchServer from "./fetchServer";
+import '../css/ChatDisplay.css';
+import { IoMdSend } from "react-icons/io";
 
-function ChatDisplay({chat, addToDisplay, sendMessage, display, userId}) {
+function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages, updateMessage, userId}) {
     const [text, setText] = useState('');
+    const [shift, setShift] = useState(false);
+    const ref = useRef(null);
+
+    const scrollToLastMessage = () => {
+        const lastChildElement = ref.current?.lastElementChild;
+        lastChildElement?.scrollIntoView({ behavior: 'smooth' });
+    };
+
     useEffect(() => {
-        console.log(chat);
-        if(chat && chat.messages.length === 0) {
+        if(chat && chat.messages.length === 0 && !chat.allMessages) {
             fetchServer(`/messages?chatId=${chat.id}&reverse=true&limit=20`, (result, error, status) => {
                 if(error) {
                     alert(`שגיאה${status}: טעינת הודעות הצ'אט נכשלה`);
                 } else {
-                    display(result);
+                    display(result.reverse());
+                    if(result.length < 20) {
+                        setAllMessages(true);
+                    }
                 }
             })
         }
+        scrollToLastMessage();
     }, [chat]);
 
-    const addChat = () => {
-        const body = {text_ : text, senderId: userId, chatId: chat.id, is_read: true};
-        fetchServer('/messages', (result, error, status) => {
-            if(error) {
-                alert(`שגיאה${status}: הוספת ההודעה נכשלה`);
-            } else {
-                addToDisplay({...body, id: result.id});
-                sendMessage({text_ : text, senderId: userId, id: result.id});
-            }
-        }, 'POST', JSON.stringify(body), { 'Content-Type': 'application/json'})
+    const addMessage = () => {
+        if(text.trim() !== '') {
+            const {groupId, partnerId} = chat;
+            let body = {text_ : text.trim(), senderId: userId, chatId: chat.id};
+            if(partnerId) body = {...body, partnerId};
+            else body = {...body, groupId};
+            fetchServer('/messages', (result, error, status) => {
+                if(error) {
+                    alert(`שגיאה${status}: הוספת ההודעה נכשלה`);
+                } else {
+                    addToDisplay({...body, id: result.id});
+                    sendMessage({text_ : text, senderId: userId, id: result.id, groupId: chat.groupId});
+                }
+            }, 'POST', JSON.stringify(body), { 'Content-Type': 'application/json'})
+            setText('');
+        }
     }
+
+    const handleKeyUp = ({key}) => {
+        if(!shift && key === 'Enter') {
+            if(text !== '\n') {
+                addMessage();
+            } else {
+                setText('');
+            }
+        } else if(key === 'Shift') {
+            setShift(false)
+        }
+    }
+
+    const handleKeyDown = ({key}) => {
+        if(key === 'Shift') {
+            setShift(true);
+        }
+    }
+
+
     return (
         <div className="chat-display">
-            <div style={{display: chat? 'block': 'none'}}>
-                {chat&&chat.messages.map(message => <Message
-                    key={message.id}
-                    text={message.text_}
-                    senderId={message.senderId}
-                    read={message.is_read} />)}
-                <textarea value={text} onChange={({target}) => setText(target.value)} />
-                <button onClick={addChat}>שלח הודעה</button>
+            <div className={"chat-display"+(chat?'': ' unvisible')} >
+                <div className="chat-messages" ref={ref}>
+                    {chat&&chat.messages.map(message => <Message
+                        key={message.id}
+                        text={message.text_}
+                        senderName={chat.fullname}
+                        senderId={message.senderId}
+                        groupId={chat.groupId}
+                        my={message.senderId===userId}
+                        read={message.is_read} />)}
+                </div>
+                <div className="text-line">
+                    <textarea value={text} onChange={({target}) => setText(target.value)}
+                    onKeyUp={handleKeyUp}
+                    onKeyDown={handleKeyDown} />
+                    <IoMdSend className="send" onClick={addMessage}/>
+                </div>
             </div>
         </div>
         

@@ -33,11 +33,20 @@ function NavChats({userId, chats, selectedChatId, addToDisplay, selectChat, dele
         })}
     }
 
+    const handleKeyUp = ({key}) => {
+        if(key === 'Enter') {
+            addChat();
+        }
+    }
+
     return (
         <nav className="nav-chats">
             <div className="search">
                 <div className="input-search">
-                    <input value={username} onChange={({target}) => setUsername(target.value)} placeholder="חיפוש או התחלת צ'אט חדש" />
+                    <input value={username} 
+                        onChange={({target}) => setUsername(target.value)} 
+                        placeholder={"חיפוש או התחלת צ'אט חדש עפ\"י שם משתמש"}
+                        onKeyUp={handleKeyUp} />
                     <FaSearch onClick={addChat} />
                 </div>
             </div>

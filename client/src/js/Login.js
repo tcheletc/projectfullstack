@@ -23,7 +23,7 @@ function Login() {
               setErr(`שגיאה${status||''}: ההתחברות נכשלה`);
           } else {
             setErr('');
-            localStorage.setItem('user', JSON.stringify(user));
+            sessionStorage.setItem('user', JSON.stringify(user));
             history(`/users/${user.username}`);
           }
           setLoading(false);

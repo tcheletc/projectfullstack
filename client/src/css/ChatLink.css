@@ -3,6 +3,21 @@
     border-bottom: 1px solid rgb(234, 239, 241);
     padding: 10px;
     cursor: pointer;
+    display: flex;
+}
+
+.chat-link div {
+    flex: 1;
+}
+
+.chat-link .icon {
+    height: 100%;
+    font-size: 20px;
+    color: hsl(347, 51%, 55%);
+}
+
+.chat-link .icon:hover {
+    color: rgb(174, 57, 82);
 }
 
 .chat-link:hover {

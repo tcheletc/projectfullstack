@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import '../css/ChatLink.css';
 import fetchServer from "./fetchServer";
+import {MdDelete} from 'react-icons/md'
 
 function ChatLink({chat, selected, selectChat, deleteFromDisplay}) {
     const [name, setName] = useState('');
@@ -19,22 +20,25 @@ function ChatLink({chat, selected, selectChat, deleteFromDisplay}) {
     }, [chat]);
 
     const deleteChat = () => {
-        fetchServer(`/chats/${chat.id}`, (result, error, status) => {
-            if(error) {
-                if(status === 404) {
-                    alert("הצ'אט לא קיים במערכת")
-                } else
-                alert(`שגיאה${status||''}: מחיקת הצ'אט נכשלה`);
-            } else {
-                deleteFromDisplay();
-            }
-        }, 'DELETE')
+        const ok = window.confirm("האם אתם בטוחים שאתם רוצים למחוק את הצ'אט?");
+        if(ok) {
+            fetchServer(`/chats/${chat.id}`, (result, error, status) => {
+                if(error) {
+                    if(status === 404) {
+                        alert("הצ'אט לא קיים במערכת")
+                    } else
+                    alert(`שגיאה${status||''}: מחיקת הצ'אט נכשלה`);
+                } else {
+                    deleteFromDisplay();
+                }
+            }, 'DELETE')
+        }
     }
 
     return (
         <div className={"chat-link" + (selected?' selected': '')} onClick={selectChat}>
-            <span>{name}</span>
-            <button onClick={deleteChat}>מחיקה</button>
+            <div>{name}</div>
+            <MdDelete className="icon" onClick={deleteChat} />
         </div>
     );
 }
