@@ -3,9 +3,11 @@ import fetchServer from "./fetchServer";
 import '../css/NavChats.css'
 import { useState } from "react";
 import { FaSearch } from "react-icons/fa";
+import { TfiMenu } from 'react-icons/tfi';
 
 function NavChats({userId, chats, selectedChatId, addToDisplay, selectChat, deleteFromDisplay}) {
     const [username, setUsername] = useState('');
+    const [open, setOpen] = useState(false);
     const addChat = () => {
         if(chats.some(chat => chat.username === username)) {
             console.log(chats)
@@ -39,26 +41,33 @@ function NavChats({userId, chats, selectedChatId, addToDisplay, selectChat, dele
         }
     }
 
+    const showNav = () => {
+        setOpen(open => !open);
+    }
+
     return (
-        <nav className="nav-chats">
-            <div className="search">
-                <div className="input-search">
-                    <input value={username} 
-                        onChange={({target}) => setUsername(target.value)} 
-                        placeholder={"חיפוש או התחלת צ'אט חדש עפ\"י שם משתמש"}
-                        onKeyUp={handleKeyUp} />
-                    <FaSearch onClick={addChat} />
+        <div className={"background-menu"+(open? ' open': '')}>
+            <TfiMenu className="menu-icon" onClick={showNav} />
+            <nav className="nav-chats">
+                <div className="search">
+                    <div className="input-search">
+                        <input value={username} 
+                            onChange={({target}) => setUsername(target.value)} 
+                            placeholder={"חיפוש או התחלת צ'אט חדש עפ\"י שם משתמש"}
+                            onKeyUp={handleKeyUp} />
+                        <FaSearch onClick={addChat} />
+                    </div>
                 </div>
-            </div>
-            <div className="chat-links">
-                {chats.map(chat => <ChatLink 
-                key={chat.id} 
-                chat={chat}
-                deleteFromDisplay={() => deleteFromDisplay(chat.id)} 
-                selected={selectedChatId===chat.id}
-                selectChat={() => selectChat(chat.id)} />)}
-            </div>
-        </nav>
+                <div className="chat-links">
+                    {chats.map(chat => <ChatLink 
+                    key={chat.id} 
+                    chat={chat}
+                    deleteFromDisplay={() => deleteFromDisplay(chat.id)} 
+                    selected={selectedChatId===chat.id}
+                    selectChat={() => selectChat(chat.id)} />)}
+                </div>
+            </nav>
+        </div>
     );
 
 }

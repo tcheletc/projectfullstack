@@ -3,6 +3,9 @@
     flex-direction: column;
     width: 310px;
     border-left: 1px solid rgb(210, 233, 243);
+    border-top: 1px solid rgb(210, 233, 243);
+    flex: 1;
+    background-color: white;
 }
 
 .chat-links {
@@ -30,4 +33,44 @@
 
 .input-search input:focus {
     outline: none;
+}
+
+.menu-icon {
+    display: none;
+    font-size: 30px;
+    color: #5782e0;
+    cursor: pointer;
+}
+
+.menu-icon:hover {
+    color: #3b5998;
+}
+
+.background-menu {
+    background-color: transparent;
+    display: flex;
+    flex-direction: column;
+}
+
+@media only screen and (max-width: 765px) {
+    .background-menu {
+        position: absolute;
+        z-index: 10;
+    }
+
+    .background-menu.open {
+        height: 100%;
+    }
+
+    .menu-icon {
+        display: block;
+    }
+
+    .nav-chats {
+        display: none;
+    }
+
+    .background-menu.open .nav-chats {
+        display: flex;
+    }
 }

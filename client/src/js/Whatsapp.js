@@ -75,10 +75,10 @@ function Whatsapp() {
             if(!message.groupId) {
                 if(chats.some(chat => chat.partnerId === message.senderId)) {
                     let chat = chats.find(chat => chat.partnerId === message.senderId);
+                    console.log(message, chat);
                     addMessageToChat({...message, chatId: chat.id}, chat.id);
                 }
             }
-            //alert(message);
         });
     }, [username, navigate]);
 

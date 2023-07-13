@@ -17,8 +17,9 @@
 
 .message h3 {
     text-align: right;
-    font-size: 30px;
+    font-size: inherit;
     color: cornflowerblue;
+    margin: 0;
 }
 
 /* Dropdown Button */

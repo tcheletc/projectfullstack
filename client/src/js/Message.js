@@ -6,16 +6,16 @@ function Message({text, my, senderName, groupId}) {
     const handleClick = () => setShown(shown => !shown);
     return (
     <div className={"message" + (my? ' my': '')}>
-        <h3 className={(my||!groupId)&&'unvisible'}>{senderName}</h3>
-        <div class={"dropdown"+(!my? ' unvisible': '')}>
-            <RiArrowDropDownLine class="dropbtn" onClick={handleClick} />
-            <div class={"dropdown-content"+(shown?' shown':'')}>
+        <h3 className={(my||!groupId)?'unvisible':undefined}>{senderName}</h3>
+        <div className={"dropdown"+(!my? ' unvisible': '')}>
+            <RiArrowDropDownLine className="dropbtn" onClick={handleClick} />
+            <div className={"dropdown-content"+(shown?' shown':'')}>
                 <div>מחיקה מהצ'אט</div>
                 <div>מחיקה אצל כולם</div>
                 <div>Link 3</div>
             </div>
         </div>
-        {text.split('\n').map(line => <>{line}<br /></>)}
+        {text.split('\n').map((line,index) => <span key={index}>{line}<br /></span>)}
     </div>
     );
 }

@@ -11,7 +11,7 @@ function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages, 
 
     const scrollToLastMessage = () => {
         const lastChildElement = ref.current?.lastElementChild;
-        lastChildElement?.scrollIntoView({ behavior: 'smooth' });
+        lastChildElement?.scrollIntoView(/* { behavior: 'smooth' } */);
     };
 
     useEffect(() => {
@@ -31,17 +31,18 @@ function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages, 
     }, [chat]);
 
     const addMessage = () => {
-        if(text.trim() !== '') {
+        const text_ = text.trim();
+        if(text_ !== '') {
             const {groupId, partnerId} = chat;
-            let body = {text_ : text.trim(), senderId: userId, chatId: chat.id};
+            let body = {text_, senderId: userId, chatId: chat.id};
             if(partnerId) body = {...body, partnerId};
             else body = {...body, groupId};
             fetchServer('/messages', (result, error, status) => {
                 if(error) {
                     alert(`שגיאה${status}: הוספת ההודעה נכשלה`);
                 } else {
-                    addToDisplay({...body, id: result.id});
-                    sendMessage({text_ : text, senderId: userId, id: result.id, groupId: chat.groupId});
+                    sendMessage({text_, senderId: userId, id: result.id, groupId: chat.groupId});
+                    addToDisplay({...body, id: result.id});  
                 }
             }, 'POST', JSON.stringify(body), { 'Content-Type': 'application/json'})
             setText('');

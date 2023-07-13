@@ -52,3 +52,9 @@
 .send:hover {
     color: #3b5998;
 }
+
+@media only screen and (max-width: 765px) {
+    .chat-messages {
+        padding-right: 30px;
+    }
+}
