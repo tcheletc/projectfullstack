@@ -33,4 +33,21 @@ router.delete('/:chatId', (req, res) => {
     deleteObjectById(chatId, res, 'chats', 'Chat');
 });
 
+router.delete('/:chatId/messages/:messageId', (req, res) => {
+    const { chatId, messageId } = req.params;
+    const query = `DELETE FROM messages_chats
+    WHERE chatId = ? AND messageId = ?`;
+    executeQuery(query, [chatId, messageId], (error, results) => {
+        if (error) {
+          res.status(500).json({ error });
+        } else {
+          if (results.affectedRows === 0) {
+            res.status(404).json({ message: `Message in chat not found` });
+          } else {
+              res.json({ message: `Message deleted successfully from chat` });
+          }
+        }
+    })
+});
+
 module.exports = router;

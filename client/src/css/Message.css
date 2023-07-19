@@ -22,6 +22,11 @@
     margin: 0;
 }
 
+.deleted {
+  font-style: italic;
+  color: gray;
+}
+
 /* Dropdown Button */
 .dropbtn {
     color: #04AA6D;

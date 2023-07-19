@@ -4,7 +4,8 @@ import fetchServer from "./fetchServer";
 import '../css/ChatDisplay.css';
 import { IoMdSend } from "react-icons/io";
 
-function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages, updateMessage, userId}) {
+function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages,
+     updateMessage, deleteMessage, deleteMassageToEveryone, userId}) {
     const [text, setText] = useState('');
     const [shift, setShift] = useState(false);
     const ref = useRef(null);
@@ -49,6 +50,11 @@ function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages, 
         }
     }
 
+    const deleteMessageForAll = (messageId) => {
+        updateMessage(messageId, {deleted: true, text_: ''});
+        deleteMassageToEveryone(messageId);
+    }
+
     const handleKeyUp = ({key}) => {
         if(!shift && key === 'Enter') {
             if(text !== '\n') {
@@ -74,12 +80,17 @@ function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages, 
                 <div className="chat-messages" ref={ref}>
                     {chat&&chat.messages.map(message => <Message
                         key={message.id}
+                        id={message.id}
+                        chatId={chat.id}
                         text={message.text_}
                         senderName={chat.fullname}
                         senderId={message.senderId}
                         groupId={chat.groupId}
                         my={message.senderId===userId}
-                        read={message.is_read} />)}
+                        read={message.is_read}
+                        deleted={message.deleted}
+                        deleteMessage={() => deleteMessageForAll(message.id)}
+                        deleteMessageFromChat={() => deleteMessage(message.id)} />)}
                 </div>
                 <div className="text-line">
                     <textarea value={text} onChange={({target}) => setText(target.value)}

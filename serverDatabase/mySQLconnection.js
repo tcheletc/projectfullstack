@@ -35,7 +35,7 @@ const getAllObjects = (res, tableName, userQuery, schema) => {
         const { error } = schema.validate(userQuery);
 
         if (error) {
-        res.status(400).send(error.details[0].message);
+        res.status(400).json({error: error.details[0].message});
         return;
         }
         let wheres = userQuery;
@@ -118,7 +118,7 @@ const updateObjectById = (objectId, body, res, tableName, schema, objectType) =>
     const { error } = schema.validate(updatedFields);
   
     if (error) {
-      res.status(400).send(error.details[0].message);
+      res.status(400).json({error: error.details[0].message});
       return;
     } else if(Object.keys(updatedFields).length === 0) {
       res.status(400).json({error: "No field to update"});
@@ -155,11 +155,7 @@ const deleteObjectById = (objectId, res, tableName, objectType) => {
         if (results.affectedRows === 0) {
           res.status(404).json({ message: `${objectType} not found` });
         } else {
-          if (results.affectedRows === 0) {
-            res.status(404).json({ message: `${objectType} not found` });
-          } else {
             res.json({ message: `${objectType} deleted successfully` });
-          }
         }
       }
     });

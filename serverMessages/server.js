@@ -25,6 +25,11 @@ io.on('connection', socket => {
         socket.to(room).emit('receive_message', message);
     });
 
+    socket.on('delete_message', (message, room) => {
+        console.log('delete message ' + message.id);
+        socket.to(room).emit('del_message', message);
+    });
+
     socket.on('join_room', (room) => {
         socket.join(room);
     });

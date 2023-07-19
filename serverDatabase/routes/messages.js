@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Joi = require('joi');
-const {getAllObjects, getObjectById, executeQuery, updateObjectById, deleteObjectById, createObject} = require('../mySQLconnection');
+const {getAllObjects, getObjectById, executeQuery, updateObjectById} = require('../mySQLconnection');
 
 router.get('/', (req, res) => {
     const schema = Joi.object({
@@ -96,11 +96,15 @@ router.post('/', (req, res) => {
             });
         }
     });
-})
+});
 
-router.delete(':/messageId', (req, res) => {
+router.delete('/:messageId', (req, res) => {
+    const schema = Joi.object({
+        deleted: Joi.boolean().required(),
+        text_: Joi.string().required()
+    });
     const { messageId } = req.params;
-    deleteObjectById(messageId, res, 'messages', 'Message');
+    updateObjectById(messageId, {deleted: true, text_: 'deleted'}, res, 'messages', schema, 'Message');
 });
 
 module.exports = router;

@@ -24,6 +24,13 @@ function Whatsapp() {
         setChats(chats => chats.concat([chat]));
     }
 
+    const changeMessageInChat = (messageId, chatId, props) => {
+        setChats(chats => chats.map(chat => chat.id === chatId? 
+            {...chat, 
+                messages: chat.messages.map(message => message.id === messageId? 
+                    {...message, ...props}: message)} : chat));
+    }
+
     useEffect(() => {
         const userString = sessionStorage.getItem("user");
         if(!userString) {
@@ -80,6 +87,20 @@ function Whatsapp() {
                 }
             }
         });
+
+        socket.on('del_message', message => {
+            let chat;
+            console.log('delete:', message)
+            if(!message.groupId) {
+                chat = chats.find(c => c.partnerId === message.senderId);
+                console.log(chat);
+            } else {
+                chat = chats.find(c => c.groupId === message.groupId);
+            }
+            if(chat) {
+                changeMessageInChat(message.id, chat.id, {deleted: true, text_: 'deleted'});
+            }
+        });
     }, [username, navigate]);
 
     const deleteChat = (chatId) => {
@@ -91,12 +112,11 @@ function Whatsapp() {
             {...chat, messages}: chat));
     }
 
-    const changeMessageInChat = (messageId, chatId, props) => {
+    const deleteMessageFromChat = (chatId, messageId) => {
         setChats(chats => chats.map(chat => chat.id === chatId? 
-            {...chat, 
-                messages: chat.messages.map(message => message.id === messageId? 
-                    {...message, props}: message)} : chat));
+            {...chat, messages: chat.messages.filter(message => message.id !== messageId)}: chat));
     }
+
     const setAllMessagesInChat  = (allMessages, chatId) => {
         setChats(chats => chats.map(chat => chat.id === chatId? 
             {...chat, allMessages}: chat));
@@ -106,6 +126,12 @@ function Whatsapp() {
         let chat = chats.find(chat => chat.id === selectedChatId)
         let room = chat.partnerId||`group${chat.groupId}`
         socket.emit('send_message', message, room);
+    }
+
+    const deleteMassageToEveryone = (messageId) => {
+        let chat = chats.find(chat => chat.id === selectedChatId)
+        let room = chat.partnerId||`group${chat.groupId}`;
+        socket.emit('delete_message', {id: messageId, senderId: user.id, groupId: chat.groupId}, room);
     }
 
 
@@ -123,7 +149,9 @@ function Whatsapp() {
             display={(messages) => setMessagesInChat(messages, selectedChatId)}
             setAllMessages={(allMessages) => setAllMessagesInChat(allMessages, selectedChatId)}
             updateMessage={(messageId, props) => changeMessageInChat(messageId, selectedChatId, props)}
-            sendMessage={sendMessageFromUser} />
+            sendMessage={sendMessageFromUser}
+            deleteMassageToEveryone={deleteMassageToEveryone}
+            deleteMessage={(messageId) => deleteMessageFromChat(selectedChatId, messageId)} />
         </div>
     );
 }
