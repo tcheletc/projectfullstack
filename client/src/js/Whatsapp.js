@@ -5,6 +5,7 @@ import fetchServer from './fetchServer';
 import NavChats from './NavChats';
 import ChatDisplay from './ChatDisplay';
 import '../css/Whatsapp.css'
+import useAudio from './useAudio';
 const socket = io.connect('http://localhost:4000');
 
 function Whatsapp() {
@@ -14,6 +15,7 @@ function Whatsapp() {
     const [groups, setGroups] = useState([]);
     const [chats, setChats] = useState([]);
     const [selectedChatId, setSelectedChatId] = useState(null);
+    const [playing, setPlaying] = useAudio('http://novastar-main.co.hays.tx.us/NovaStar5/sounds/newmessage.wav');
 
     const addMessageToChat = (message, chatId) => {
         setChats(chats => chats.map(chat => chat.id === chatId? 
@@ -79,6 +81,10 @@ function Whatsapp() {
         socket.emit('join_room', user.id);
         socket.on('receive_message', message => {
             //TO-DO: add code for other options
+            if(playing) {
+                setPlaying(false)
+            }
+            setPlaying(true);
             if(!message.groupId) {
                 if(chats.some(chat => chat.partnerId === message.senderId)) {
                     let chat = chats.find(chat => chat.partnerId === message.senderId);
