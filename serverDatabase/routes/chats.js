@@ -28,6 +28,35 @@ router.post('/', (req, res) => {
     createObject(req.body, res, 'chats', schema, 'Chat');
 });
 
+router.put('/:chatId/read', (req, res) => {
+    const { chatId } = req.params;
+    const schema = Joi.object({
+        chatId: Joi.number().min(1).required(),
+        is_read: Joi.boolean().required()
+    });
+
+    const { error } = schema.validate({chatId, is_read: true});
+  
+    if (error) {
+      res.status(400).json({error: error.details[0].message});
+      return;
+    }
+    
+    const query = `UPDATE messages_chats SET is_read = ? WHERE chatId = ?`;
+  
+    executeQuery(query, [true, chatId], (error, results) => {
+      if (error) {
+        res.status(500).json({ error });
+      } else {
+        if (results.affectedRows === 0) {
+          res.status(404).json({ message: `Messages in chat not found` });
+        } else {
+          res.json({ message: `Messages in chat updated successfully` });
+        }
+      }
+    });
+});
+
 router.delete('/:chatId', (req, res) => {
     const { chatId } = req.params;
     deleteObjectById(chatId, res, 'chats', 'Chat');

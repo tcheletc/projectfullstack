@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 const useAudio = url => {
-    const [audio] = useState(new Audio(url));
+    const audio = useMemo(() => new Audio(url), []);
     const [playing, setPlaying] = useState(false);
     
     useEffect(() => {
