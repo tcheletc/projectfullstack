@@ -18,6 +18,20 @@ function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages,
         lastChildElement?.scrollIntoView(/* { behavior: 'smooth' } */);
     };
 
+    const getNextMessages = () => {
+        fetchServer(`/messages?chatId=${chat.id}&reverse=true&limit=20&offset=${chat.messages.length}`,
+        (result, error, status) => {
+            if(error) {
+                alert(`שגיאה${status}: טעינת המשך הודעות הצ'אט נכשלה`);
+            } else {
+                display(result.reverse().concat(chat.messages));
+                if(result.length < 20) {
+                    setAllMessages(true);
+                }
+            }
+        })
+    }
+
     useEffect(() => {
         if(chat && chat.messages.length === 0 && !chat.allMessages) {
             fetchServer(`/messages?chatId=${chat.id}&reverse=true&limit=20`, (result, error, status) => {
@@ -33,6 +47,12 @@ function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages,
         }
         scrollToLastMessage();
     }, [chat]);
+
+    const handleScroll = (e) => {
+        if(chat && chat.messages.length > 0 && !chat.allMessages && e.currentTarget.scrollTop === 0) {
+            getNextMessages();
+        }
+    }
 
     const addMessage = () => {
         const text_ = text.trim();
@@ -81,7 +101,7 @@ function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages,
         <div className="chat-display">
             {!fullDesc ? (<div className={"chat-display"+(chat?'': ' unvisible')} >
                 <ChatDescribe chat={chat} setFullDesc={() => setFullDesc(true)} />
-                <div className="chat-messages" ref={ref}>
+                <div className="chat-messages" ref={ref} onScroll={handleScroll}>
                     {chat&&chat.messages.map(message => <Message
                         key={message.id}
                         id={message.id}
