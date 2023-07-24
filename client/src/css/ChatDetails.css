@@ -1,0 +1,39 @@
+.chat-details {
+    background-color: white;
+    z-index: 11;
+    padding: 10px;
+    flex: 1;
+}
+
+.chat-details img {
+    width: 150px;
+    border-radius: 50%;
+}
+
+.chat-details h3 {
+    color: #3b5998;
+}
+
+.chat-details p {
+    margin-top: 1em;
+    margin-bottom: 0;
+}
+
+.chat-details .back-icon {
+    transform: scaleX(-1);
+    color: #3b5998;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.chat-details .details-chat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+@media only screen and (max-width: 765px) {
+    .chat-details {
+        padding-right: 35px;
+    }
+}

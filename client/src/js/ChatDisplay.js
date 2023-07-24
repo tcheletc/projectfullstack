@@ -3,11 +3,14 @@ import Message from "./Message";
 import fetchServer from "./fetchServer";
 import '../css/ChatDisplay.css';
 import { IoMdSend } from "react-icons/io";
+import ChatDescribe from "./ChatDescribe";
+import ChatDetails from './ChatDetails';
 
 function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages,
      updateMessage, deleteMessage, deleteMassageToEveryone, userId}) {
     const [text, setText] = useState('');
     const [shift, setShift] = useState(false);
+    const [fullDesc, setFullDesc] = useState(false);
     const ref = useRef(null);
 
     const scrollToLastMessage = () => {
@@ -76,7 +79,8 @@ function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages,
 
     return (
         <div className="chat-display">
-            <div className={"chat-display"+(chat?'': ' unvisible')} >
+            {!fullDesc ? (<div className={"chat-display"+(chat?'': ' unvisible')} >
+                <ChatDescribe chat={chat} setFullDesc={() => setFullDesc(true)} />
                 <div className="chat-messages" ref={ref}>
                     {chat&&chat.messages.map(message => <Message
                         key={message.id}
@@ -98,7 +102,8 @@ function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages,
                     onKeyDown={handleKeyDown} />
                     <IoMdSend className="send" onClick={addMessage}/>
                 </div>
-            </div>
+            </div>) : (<>{chat ? (<ChatDetails chat={chat}
+            goBack={() => setFullDesc(false)} />) : <></>}</>)}
         </div>
         
     )

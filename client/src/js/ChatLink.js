@@ -13,8 +13,8 @@ function ChatLink({chat, selected, selectChat, deleteFromDisplay}) {
         } else if(chat.name_) {
             name_ = chat.name_;
         }
-        if(name&&name.length > 40) {
-            name_ = name.slice(0, 47) + '...';
+        if(name_&&name_.length > 20) {
+            name_ = name_.slice(0, 17) + '...';
         }
         setName(name_);
     }, [chat]);
