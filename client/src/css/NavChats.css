@@ -8,6 +8,22 @@
     background-color: white;
 }
 
+.navbar {
+    padding: 10px;
+    border-bottom: 1px solid rgb(210, 233, 243);
+    display: flex;
+    gap: 5px;
+}
+
+.navbar .icon {
+    background-color: rgb(234, 239, 241);
+    border-radius: 50%;
+    color: #3b5998;
+    padding: 2px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
 .chat-links {
     border-top: 1px solid rgb(234, 239, 241);
 }
@@ -29,6 +45,17 @@
     background-color: rgb(234, 239, 241);
     border: none;
     flex: 1;
+}
+
+.navbar .loguot-icon {
+    margin-right: auto;
+    cursor: pointer;
+    color: #5782e0;
+    font-size: 20px;
+}
+
+.navbar .loguot-icon:hover {
+    color: #3b5998;
 }
 
 .input-search input:focus {

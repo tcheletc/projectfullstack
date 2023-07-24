@@ -5,28 +5,28 @@
     flex: 1;
 }
 
-.chat-details img {
+img {
     width: 150px;
     border-radius: 50%;
 }
 
-.chat-details h3 {
+h3 {
     color: #3b5998;
 }
 
-.chat-details p {
+p {
     margin-top: 1em;
     margin-bottom: 0;
 }
 
-.chat-details .back-icon {
+.back-icon {
     transform: scaleX(-1);
     color: #3b5998;
     cursor: pointer;
     font-size: 20px;
 }
 
-.chat-details .details-chat {
+.details-chat {
     display: flex;
     flex-direction: column;
     align-items: center;

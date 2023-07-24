@@ -38,7 +38,7 @@ router.post('/', (req, res) => {
   const { error } = schema.validate(req.body);
   
   if (error) {
-    res.status(400).send(error.details[0].message);
+    res.status(400).send({error: error.details[0].message});
     return;
   }
 

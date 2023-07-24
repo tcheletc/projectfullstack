@@ -1,0 +1,13 @@
+.edit-icon-container {
+    display: flex;
+    gap: 5px;
+}
+
+.edit-icon, .save-button {
+    cursor: pointer;
+    color: #5782e0;
+}
+
+.edit-icon:hover, .save-button:hover {
+    color: #3b5998;
+}

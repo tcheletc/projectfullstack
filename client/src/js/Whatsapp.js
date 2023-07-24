@@ -137,12 +137,13 @@ function Whatsapp() {
 
     return (
         <div className='whatsapp'>
-            <NavChats userId={user.id}
+            <NavChats user={user}
              chats={chats} 
              selectedChatId={selectedChatId}
              selectChat={setSelectedChatId}
              addToDisplay={addChat}
-             deleteFromDisplay={deleteChat} />
+             deleteFromDisplay={deleteChat}
+             updateProfile={setUser} />
             <ChatDisplay chat={selectedChatId&&chats.find(chat => chat.id === selectedChatId)}
             userId={user.id}
             addToDisplay={(message) => addMessageToChat(message, selectedChatId)}
