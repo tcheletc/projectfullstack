@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef } from "react";
 import Message from "./Message";
 import fetchServer from "./fetchServer";
 import '../css/ChatDisplay.css';
@@ -13,8 +13,9 @@ function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages,
     const [fullDesc, setFullDesc] = useState(false);
     const [indexNew, setIndexNew] = useState(-1);
     const [scroll, setScroll] = useState(0);
-    const [onBottom, setOnBottom] = useState(true);
+    const [onBottom, setOnBottom] = useState(false);
     const ref = useRef(null);
+    const refNewMsg = useRef(null);
 
     const scrollToLastMessage = () => {
         const lastChildElement = ref.current?.lastElementChild;
@@ -50,21 +51,25 @@ function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages,
     }
 
     useEffect(() => {
-        if(chat && chat.messages.length === 0 && !chat.allMessages) {
-            fetchServer(`/messages?chatId=${chat.id}&reverse=true&limit=20`, (result, error, status) => {
-                if(error) {
-                    alert(`שגיאה${status}: טעינת הודעות הצ'אט נכשלה`);
-                } else {
-                    display(result.reverse());
-                    if(result.length < 20) {
-                        setAllMessages(true);
-                    }
-                }
-            })
-        }
-        if(onBottom) {
+        const index = chat?.messages?.findIndex(m => !m.is_read);
+        setIndexNew(index);
+        if( index > -1) {
+            setOnBottom(false);
+            refNewMsg?.current?.scrollIntoView();
+            readMessages(true, index);
+        } else {
+            setOnBottom(true);
             scrollToLastMessage();
         }
+    }, [chat?.id]);
+
+    useEffect(() => {
+        if(chat && chat.messages.length < 20 && !chat.allMessages) {
+            getNextMessages();
+        }
+        // if(onBottom) {
+        //     scrollToLastMessage();
+        // }
     }, [chat]);
 
     useEffect(() => {
@@ -84,11 +89,11 @@ function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages,
                 ref?.current?.scrollTo({top: ref.current.scrollHeight - scroll});
             }
         }
-    }, [chat?.id, chat?.messages?.length]);
+    }, [chat?.messages?.length]);
 
-    useEffect(() => {
-        scrollToLastMessage();
-    }, [chat?.id])
+    // useEffect(() => {
+    //     scrollToLastMessage();
+    // }, [chat?.id])
 
     const handleScroll = (e) => {
         setScroll(e.currentTarget.scrollHeight - e.currentTarget.scrollTop);
@@ -104,6 +109,7 @@ function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages,
 
     const addMessage = () => {
         const text_ = text.trim();
+        setIndexNew(-1);
         if(text_ !== '') {
             const {groupId, partnerId} = chat;
             let body = {text_, senderId: userId, chatId: chat.id};
@@ -169,7 +175,7 @@ function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages,
                     {chat&&(indexNew > -1? mapMessagesToElements(chat.messages.slice(0, indexNew))
                         : mapMessagesToElements(chat.messages))}
                     {indexNew > -1? (<>
-                        <div className="new-messages">{chat&&(chat.messages.length - indexNew)} הודעות חדשות</div>
+                        <div className="new-messages" ref={refNewMsg}>{chat&&(chat.messages.length - indexNew)} הודעות חדשות</div>
                         {chat&&mapMessagesToElements(chat.messages.slice(indexNew))}
                     </>) : <></>}
                 </div>

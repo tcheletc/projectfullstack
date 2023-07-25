@@ -6,7 +6,7 @@
     display: flex;
 }
 
-.chat-link div {
+.chat-link div.name {
     flex: 1;
 }
 
@@ -26,4 +26,14 @@
 
 .chat-link.selected {
     border-left: 3px solid skyblue;
+}
+
+.chat-link .num-new-messages {
+    font-size: 11px;
+    border-radius: 50%;
+    padding: 1px 6px;
+    color: white;
+    background-color: cornflowerblue;
+    aspect-ratio: 1/1;
+    align-self: center;
 }

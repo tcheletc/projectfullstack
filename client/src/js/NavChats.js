@@ -10,7 +10,8 @@ import { FiLogOut } from 'react-icons/fi';
 import Profile from './Profile';
 import AddGroup from "./AddGroup";
 
-function NavChats({user, chats, selectedChatId, addToDisplay, selectChat, deleteFromDisplay, updateProfile}) {
+function NavChats({user, chats, selectedChatId, addToDisplay, selectChat,
+     deleteFromDisplay, updateProfile, disconnectServer}) {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [open, setOpen] = useState(false);
@@ -18,7 +19,6 @@ function NavChats({user, chats, selectedChatId, addToDisplay, selectChat, delete
 
     const addChat = () => {
         if(chats.some(chat => chat.username === username)) {
-            console.log(chats)
             let chat = chats.find(c => c.username === username);
             selectChat(chat.id);
         } else {
@@ -34,7 +34,6 @@ function NavChats({user, chats, selectedChatId, addToDisplay, selectChat, delete
                     if(error) {
                         alert(`שגיאה${status||''}: הוספת צ'אט נכשלה`);
                     } else {
-                        console.log(result);
                         addToDisplay({...body, id: result.id, groupId: null,
                             fullname, username, email, phone, messages: []});
                     }
@@ -54,6 +53,7 @@ function NavChats({user, chats, selectedChatId, addToDisplay, selectChat, delete
     }
 
     const logout = () => {
+        disconnectServer();
         sessionStorage.removeItem('user');
         navigate('/login');
     }

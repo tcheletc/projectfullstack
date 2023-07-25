@@ -4,7 +4,7 @@
     border: 1px solid  rgb(234, 239, 241);
     border-radius: 15px;
     padding: 8px;
-    width: max-content;
+    align-self: flex-start;
     max-width: 70%;
 }
 

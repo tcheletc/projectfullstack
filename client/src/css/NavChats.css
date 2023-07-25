@@ -80,7 +80,7 @@
     flex-direction: column;
 }
 
-@media only screen and (max-width: 765px) {
+@media only screen and (max-width: 550px) {
     .background-menu {
         position: absolute;
         z-index: 12;
@@ -100,5 +100,11 @@
 
     .background-menu.open .nav-chats {
         display: flex;
+    }
+}
+
+@media only screen and (max-width: 320px) {
+    .nav-chats {
+        width: 250px;
     }
 }

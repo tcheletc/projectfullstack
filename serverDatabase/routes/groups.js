@@ -9,7 +9,7 @@ router.get('/', (req, res) => {
         name_: Joi.string().min(1),
         is_admin: Joi.boolean(),
         limit: Joi.number().min(1),
-        offset: Joi.number().min(1)
+        offset: Joi.number().min(0)
     });
     getAllObjects(res, 'groups_ join users_groups on id=groupId', req.query, schema);
 });

@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
         senderId: Joi.number().min(1),
         is_read: Joi.boolean(),
         limit: Joi.number().min(1),
-        offset: Joi.number().min(1),
+        offset: Joi.number().min(0),
         reverse: Joi.boolean()
     });
     getAllObjects(res, 'messages join messages_chats on messageId=id', req.query, schema);

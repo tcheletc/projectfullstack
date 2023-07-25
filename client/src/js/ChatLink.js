@@ -17,7 +17,7 @@ function ChatLink({chat, selected, selectChat, deleteFromDisplay}) {
             name_ = name_.slice(0, 17) + '...';
         }
         setName(name_);
-    }, [chat]);
+    }, [chat?.fullname, chat?.name]);
 
     const deleteChat = () => {
         const ok = window.confirm("האם אתם בטוחים שאתם רוצים למחוק את הצ'אט?");
@@ -34,10 +34,12 @@ function ChatLink({chat, selected, selectChat, deleteFromDisplay}) {
             }, 'DELETE')
         }
     }
+    const newMessages = chat.messages.filter(m => !m.is_read).length;
 
     return (
         <div className={"chat-link" + (selected?' selected': '')} onClick={selectChat}>
-            <div>{name}</div>
+            <div className="name">{name}</div>
+            {newMessages > 0? <div className="num-new-messages">{newMessages}</div>: <></>}
             <MdDelete className="icon" onClick={deleteChat} />
         </div>
     );

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom'
 import io from 'socket.io-client'
 import fetchServer from './fetchServer';
@@ -33,6 +33,37 @@ function Whatsapp() {
                     {...message, ...props}: message)} : chat));
     }
 
+    const setMessagesInChat = (messages, chatId) => {
+        setChats(chats => chats.map(chat => chat.id === chatId? 
+            {...chat, messages}: chat));
+    }
+
+    const getChatMessages = useCallback((chat, groups, callback) => {
+        fetchServer(`/messages?chatId=${chat.id}&is_read=false`, (res, err, stat) => {
+            if(err) {
+                alert(`שגיאה${stat}: טעינת הודעות הצ'אט ${chat.id} שלא נקראו נכשלה`);
+            } else {
+                callback({...chat, messages: res, allMessages: false}, groups);
+            }
+        })
+    }, []);
+
+    const getChatInfo = useCallback((chat, groups) => {
+        if(chat.partnerId) {
+            fetchServer(`/users/${chat.partnerId}`, (result, error, status) => {
+                if(error) {
+                    alert(`שגיאה${status||''}: הבאת מידע על השותף של הצ'אט ${chat.id} נכשלה`);
+                } else {
+                    const {fullname, username, email, phone} = result;
+                    setChats(prevChats => [...prevChats, {...chat, fullname, username, email, phone}]);
+                }
+            });
+        } else {
+            const group = groups.find(g => g.id === chat.groupId);
+            setChats(prevChats => [...prevChats, {...chat, name_: group.name_}]);
+        }
+    }, []);
+
     useEffect(() => {
         const userString = sessionStorage.getItem("user");
         if(!userString) {
@@ -45,39 +76,24 @@ function Whatsapp() {
             navigate(`/users/${user.username}`);
             return;
         }
+        setChats([]);
 
         fetchServer(`/groups?userId=${user.id}`, (result, error, status) => {
             if(error) {
                 alert(`שגיאה${status}: הבאת קבוצות המשתמש נכשלה`);
             } else {
-                console.log(result);
                 setGroups(result);
                 result.forEach(group =>socket.emit('join_room', `group${group.id}`));
+                fetchServer(`/chats?userId=${user.id}`, (res, error, status) => {
+                    if(error) {
+                        alert(`שגיאה${status}: הבאת צ'אטים של המשתמש נכשלה`);
+                    } else {
+                        res.forEach(chat => getChatMessages(chat, result, getChatInfo));
+                    }
+                });
             }
         });
 
-        fetchServer(`/chats?userId=${user.id}`, (result, error, status) => {
-            if(error) {
-                alert(`שגיאה${status}: הבאת צ'אטים של המשתמש נכשלה`);
-            } else {
-                setChats(result.map(chat => { return {...chat, messages: [], allMessages: false}
-                }));
-                console.log(result);
-                result.forEach(chat => {
-                    if(chat.partnerId) {
-                        fetchServer(`/users/${chat.partnerId}`, (result, error, status) => {
-                            if(error) {
-                                alert(`שגיאה${status||''}: הבאת מידע על השותף של הצ'אט ${chat.id} נכשלה`);
-                            } else {
-                                const {fullname, username, email, phone} = result;
-                                setChats(chats =>(chats.map(c => c.id === chat.id? 
-                                    {...c, fullname, username, email, phone}: c)));
-                            }
-                        });
-                    }
-                })
-            }
-        });
         socket.emit('join_room', user.id);
         socket.on('receive_message', message => {
             //TO-DO: add code for other options
@@ -85,7 +101,7 @@ function Whatsapp() {
                 setPlaying(false)
             }
             setPlaying(true);
-            if(!message.groupId) {
+            if(message.partnerId) {
                 if(chats.some(chat => chat.partnerId === message.senderId)) {
                     let chat = chats.find(chat => chat.partnerId === message.senderId);
                     console.log(message, chat);
@@ -112,11 +128,6 @@ function Whatsapp() {
     const deleteChat = (chatId) => {
         setChats(chats => chats.filter(chat => chat.id !== chatId));
     }
-    
-    const setMessagesInChat = (messages, chatId) => {
-        setChats(chats => chats.map(chat => chat.id === chatId? 
-            {...chat, messages}: chat));
-    }
 
     const deleteMessageFromChat = (chatId, messageId) => {
         setChats(chats => chats.map(chat => chat.id === chatId? 
@@ -140,6 +151,10 @@ function Whatsapp() {
         socket.emit('delete_message', {id: messageId, senderId: user.id, groupId: chat.groupId}, room);
     }
 
+    const disconnectServer = () => {
+        socket.emit('disconnct');
+    }
+
 
     return (
         <div className='whatsapp'>
@@ -148,6 +163,7 @@ function Whatsapp() {
              selectedChatId={selectedChatId}
              selectChat={setSelectedChatId}
              addToDisplay={addChat}
+             disconnectServer={disconnectServer}
              deleteFromDisplay={deleteChat}
              updateProfile={setUser} />
             <ChatDisplay chat={selectedChatId&&chats.find(chat => chat.id === selectedChatId)}

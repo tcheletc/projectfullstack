@@ -19,7 +19,7 @@
     cursor: pointer;
 }
 
-@media only screen and (max-width: 765px) {
+@media only screen and (max-width: 550px) {
     .chat-desc {
         padding-right: 35px;
     }

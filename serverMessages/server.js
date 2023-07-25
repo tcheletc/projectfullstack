@@ -37,6 +37,10 @@ io.on('connection', socket => {
     socket.on('leave_room', (room) => {
         socket.leave(room);
     });
+
+    socket.on("disconnct", () => {
+        socket.disconnect();
+    })
 })
 
 server.listen(port, () => {
