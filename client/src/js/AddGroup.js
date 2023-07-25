@@ -60,7 +60,7 @@ function AddGroup({goBack, userId, username}) {
                 setUsers([{username: ''}]);
             }
         }, 'POST', 
-        JSON.stringify({name_, users, userId}),
+        JSON.stringify({name_, users: users.map(u => u.id), userId}),
         { 'Content-Type': 'application/json'})
     }
 
