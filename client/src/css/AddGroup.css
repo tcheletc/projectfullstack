@@ -1,0 +1,22 @@
+.add-group {
+    padding: 10px;
+}
+
+.member-group {
+    display: flex;
+}
+
+.member-group input {
+    flex: 1;
+}
+
+.member-group .icon {
+    height: 100%;
+    font-size: 20px;
+    color: hsl(347, 51%, 55%);
+    cursor: pointer;
+}
+
+.member-group .icon:hover {
+    color: rgb(174, 57, 82);
+}

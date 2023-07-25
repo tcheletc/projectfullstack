@@ -87,7 +87,7 @@ function NavChats({user, chats, selectedChatId, addToDisplay, selectChat,
                 </div>
             </nav>) : content === 'profile' ?
             <Profile user={user} goBack={() => setContent('navbar')} updateProfile={updateProfile} /> :
-            <AddGroup goBack={() => setContent('navbar')} />}
+            <AddGroup goBack={() => setContent('navbar')} userId={user.id} username={user.username} />}
         </div>
     );
 
