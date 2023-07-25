@@ -11,7 +11,7 @@ import Profile from './Profile';
 import AddGroup from "./AddGroup";
 
 function NavChats({user, chats, selectedChatId, addToDisplay, selectChat,
-     deleteFromDisplay, updateProfile, disconnectServer}) {
+     deleteFromDisplay, updateProfile, disconnectServer, displayGroup}) {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [open, setOpen] = useState(false);
@@ -87,7 +87,8 @@ function NavChats({user, chats, selectedChatId, addToDisplay, selectChat,
                 </div>
             </nav>) : content === 'profile' ?
             <Profile user={user} goBack={() => setContent('navbar')} updateProfile={updateProfile} /> :
-            <AddGroup goBack={() => setContent('navbar')} userId={user.id} username={user.username} />}
+            <AddGroup goBack={() => setContent('navbar')} userId={user.id} username={user.username}
+            displayGroup={displayGroup} user={user} />}
         </div>
     );
 

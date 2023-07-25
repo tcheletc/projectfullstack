@@ -19,4 +19,43 @@ router.get('/:groupId', (req, res) => {
     getObjectById(groupId, res, 'groups_ join users_groups on id=groupId', 'Group')
 });
 
+router.post('/', (req, res) => {
+    const schema = Joi.object({
+      name_: Joi.string().min(1).required(),
+      userId: Joi.number().min(1).required(),
+      users: Joi.array().required()
+      //phone: myCustomJoi.string().phoneNumber().required(),
+      //password_: Joi.string().min(6).required()
+    });
+  
+    const { error } = schema.validate(req.body);
+    
+    if (error) {
+      res.status(400).send(error.details[0].message);
+      return;
+    }
+
+    const {name_, userId, users} = req.body;
+  
+    const usersValues = Object.values([userId, ...users]);
+    const queryGroup = 'INSERT INTO groups_(name_) values(?)'
+  
+    executeQuery(queryGroup, [name_], (error, results) => {
+      if (error) {
+        res.status(500).json({ error });
+      } else {
+        const usersValuesClosure = users.map(u => `(?, ${results.insertId}, false)`).join(',');
+        const usersQuery = `INSERT INTO users_groups
+        values(?, ${results.insertId}, true),${usersValuesClosure}`;
+        executeQuery(usersQuery, usersValues, (error, result) => {
+          if (error) {
+            res.status(500).json({ error });
+          } else {
+            res.status(201).json({ message: `Group created successfully`, id: results.insertId });
+          }
+        });
+      }
+    });
+  });
+
 module.exports = router;

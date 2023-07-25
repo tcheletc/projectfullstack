@@ -4,7 +4,7 @@ import fetchServer from './fetchServer';
 import { MdDelete } from 'react-icons/md';
 import '../css/AddGroup.css';
 
-function AddGroup({goBack, userId, username}) {
+function AddGroup({goBack, userId, username, displayGroup, user}) {
     const [name_, setName] = useState('');
     const [users, setUsers] = useState([{username: ''}]);
 
@@ -55,7 +55,11 @@ function AddGroup({goBack, userId, username}) {
             if(err) {
                 alert(`שגיאה${stat}: יצירת הקבוצה נכשלה`);
             } else {
+                alert('הקבוצה נוספה');
                 //ADD group to display
+                displayGroup({name_, 
+                    users: users.map(u => ({...u, is_admin: false})).concat([{...user, is_admin: true}])
+                    , id: res.id});
                 setName('');
                 setUsers([{username: ''}]);
             }
@@ -64,7 +68,8 @@ function AddGroup({goBack, userId, username}) {
         { 'Content-Type': 'application/json'})
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = (e) => {
+        e.preventDefault();
         if(users.length === 0) {
             alert('חובה להוסיף לפחות חבר אחד לקבוצה');
             return;
@@ -100,13 +105,13 @@ function AddGroup({goBack, userId, username}) {
             <h3>הוספת קבוצה</h3>
             <form onSubmit={handleSubmit}>
                 <label><strong>שם הקבוצה: </strong>{' '}
-                <input value={name_} onChange={(({target}) => setName(target.value))} /></label><br />
+                <input value={name_} onChange={(({target}) => setName(target.value))} required /></label><br />
                 <h4><strong>חברי הקבוצה: </strong></h4>
                 {users.map((user, index) => 
                     <div key={index} className='member-group'>
                         <input value={user.username} 
                         onChange={(e) => handleUsernameChange(e.target.value, index)}
-                        placeholder='שם משתמש' />
+                        placeholder='שם משתמש' required />
                         <MdDelete className="icon" onClick={() => handleRemoveClick(index)} />
                     </div>)}
                 <button type='button' onClick={handleAddClick}>+הוספת חבר לקבוצה</button>

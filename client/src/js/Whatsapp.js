@@ -64,6 +64,18 @@ function Whatsapp() {
         }
     }, []);
 
+    const addChatGroup = (groupId) => {
+        const chat = {userId: user.id, groupId};
+        fetchServer(`/chats`, (res, err, stat) => {
+            if(err) {
+                alert(`שגיאה${stat}: הוספת הצ'אט לקבוצה נכשלה`);
+            } else {
+                addChat({...chat, id: res.id, messages: []});
+            }
+        }, 'POST', 
+        JSON.stringify(chat), { 'Content-Type': 'application/json'});
+    }
+
     useEffect(() => {
         const userString = sessionStorage.getItem("user");
         if(!userString) {
@@ -123,6 +135,12 @@ function Whatsapp() {
                 changeMessageInChat(message.id, chat.id, {deleted: true, text_: 'deleted'});
             }
         });
+
+        socket.on('join_group', group => {
+            setGroups(prevGroups => prevGroups.concat([group]));
+            socket.emit('join_room', `group${group.id}`);
+            addChatGroup(group.id);
+        })
     }, [username, navigate]);
 
     const deleteChat = (chatId) => {
@@ -155,6 +173,13 @@ function Whatsapp() {
         socket.emit('disconnct');
     }
 
+    const addGroup = (group) => {
+        setGroups(prevGroups => prevGroups.concat([group]));
+        socket.emit('add_group', group, group.users.filter(u => u.id != user.id));
+        socket.emit('join_room', `group${group.id}`);
+        addChatGroup(group.id);
+    }
+
 
     return (
         <div className='whatsapp'>
@@ -165,6 +190,7 @@ function Whatsapp() {
              addToDisplay={addChat}
              disconnectServer={disconnectServer}
              deleteFromDisplay={deleteChat}
+             displayGroup={addGroup}
              updateProfile={setUser} />
             <ChatDisplay chat={selectedChatId&&chats.find(chat => chat.id === selectedChatId)}
             userId={user.id}

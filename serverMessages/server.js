@@ -30,6 +30,12 @@ io.on('connection', socket => {
         socket.to(room).emit('del_message', message);
     });
 
+    socket.on('add_group', (group, users) => {
+        users.forEach(user => {
+            socket.to(user.id).emit('join_group', group);
+        });
+    })
+
     socket.on('join_room', (room) => {
         socket.join(room);
     });
