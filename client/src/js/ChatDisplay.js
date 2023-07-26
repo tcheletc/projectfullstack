@@ -6,8 +6,8 @@ import { IoMdSend } from "react-icons/io";
 import ChatDescribe from "./ChatDescribe";
 import ChatDetails from './ChatDetails';
 
-function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages,
-     updateMessage, deleteMessage, deleteMassageToEveryone, userId}) {
+function ChatDisplay({chat, group, addToDisplay, sendMessage, display, setAllMessages,
+     updateMessage, deleteMessage, deleteMassageToEveryone, userId, setUsersGroup}) {
     const [text, setText] = useState('');
     const [shift, setShift] = useState(false);
     const [fullDesc, setFullDesc] = useState(false);
@@ -50,6 +50,23 @@ function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages,
         }, 'PUT');
     }
 
+    const getUsersGroup = () => {
+        fetchServer(`/groups/${group.id}/users`, (res, err, stat) => {
+            if(err) {
+                alert(`שגיאה${stat}: טעינת משתמשי הקבוצה נכשלה`);
+            } else {
+                setUsersGroup(group.id, res);
+            }
+        });
+    }
+
+    useEffect(() => {
+        if(chat?.groupId && group && !group.users) {
+            console.log('get users group');
+            getUsersGroup();
+        }
+    }, [chat?.groupId, group]);
+
     useEffect(() => {
         const index = chat?.messages?.findIndex(m => !m.is_read);
         setIndexNew(index);
@@ -67,9 +84,6 @@ function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages,
         if(chat && chat.messages.length < 20 && !chat.allMessages) {
             getNextMessages();
         }
-        // if(onBottom) {
-        //     scrollToLastMessage();
-        // }
     }, [chat]);
 
     useEffect(() => {
@@ -91,9 +105,6 @@ function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages,
         }
     }, [chat?.messages?.length]);
 
-    // useEffect(() => {
-    //     scrollToLastMessage();
-    // }, [chat?.id])
 
     const handleScroll = (e) => {
         setScroll(e.currentTarget.scrollHeight - e.currentTarget.scrollTop);
@@ -156,7 +167,7 @@ function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages,
             id={message.id}
             chatId={chat.id}
             text={message.text_}
-            senderName={chat.fullname}
+            senderName={chat?.groupId&&group?.users?.find(u => u.id === message.senderId)?.fullname}
             senderId={message.senderId}
             groupId={chat.groupId}
             my={message.senderId===userId}
@@ -186,7 +197,7 @@ function ChatDisplay({chat, addToDisplay, sendMessage, display, setAllMessages,
                     <IoMdSend className="send" onClick={addMessage}/>
                 </div>
             </div>) : (<>{chat ? (<ChatDetails chat={chat}
-            goBack={() => setFullDesc(false)} />) : <></>}</>)}
+            goBack={() => setFullDesc(false)} users={group&&group.users} />) : <></>}</>)}
         </div>
         
     )

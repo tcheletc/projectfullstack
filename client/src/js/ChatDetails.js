@@ -1,10 +1,11 @@
 import profileImage from '../images/profile.png';
 import groupImage from '../images/group.png';
+import MemberGroup from './MemberGroup';
 
 import '../css/ChatDetails.css';
 import {BiArrowBack} from 'react-icons/bi';
 
-function ChatDetails({chat, goBack}) {
+function ChatDetails({chat, goBack, users}) {
     return (
         <div className="chat-details">
             <BiArrowBack className='back-icon' onClick={goBack} />
@@ -12,7 +13,9 @@ function ChatDetails({chat, goBack}) {
                 <h3>{chat.fullname || chat.name_}</h3>
                 {!chat.groupId ? <img src={profileImage} alt="תמונת פרופיל" /> :
                 <img src={groupImage} alt="תמונת קבוצה" />}
-                {chat.groupId ? <></> :
+                {chat.groupId ? <>
+                    {users.map(u => <MemberGroup user={u} />)}
+                </> :
                 <>
                 <p><strong>שם משתמש:</strong> {chat.username}</p>
                 <p><strong>דוא"ל:</strong> {chat.email}</p>

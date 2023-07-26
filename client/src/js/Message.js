@@ -30,6 +30,7 @@ function Message({id, text, deleted, my, senderName, groupId, chatId, deleteMess
         }, 'DELETE');
     }
 
+
     return (
         <div className={"message" + (my? ' my': '')}>
             <h3 className={(my||!groupId)?'unvisible':undefined}>{senderName}</h3>

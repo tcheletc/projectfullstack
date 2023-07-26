@@ -13,6 +13,7 @@ function Whatsapp() {
     const navigate = useNavigate(); // Access the navigate function
     const [user, setUser] = useState({});
     const [groups, setGroups] = useState([]);
+    const [selectedGroup, setSelectedGroup] = useState(null);
     const [chats, setChats] = useState([]);
     const [selectedChatId, setSelectedChatId] = useState(null);
     const [playing, setPlaying] = useAudio('http://novastar-main.co.hays.tx.us/NovaStar5/sounds/newmessage.wav');
@@ -74,6 +75,16 @@ function Whatsapp() {
             }
         }, 'POST', 
         JSON.stringify(chat), { 'Content-Type': 'application/json'});
+    }
+
+    const getChatGroup = (groupId) => {
+        fetchServer(`/chats?userId=${user.id}&groupId=${groupId}&limit=1`, (res, err, stat) => {
+            if(err) {
+                alert(`שגיאה${stat}: טעינת הצ''אט של הקבוצה ${groupId} נכשלה`);
+            } else {
+                addChat({...res, messages: []});
+            }
+        })
     }
 
     useEffect(() => {
@@ -139,7 +150,7 @@ function Whatsapp() {
         socket.on('join_group', group => {
             setGroups(prevGroups => prevGroups.concat([group]));
             socket.emit('join_room', `group${group.id}`);
-            addChatGroup(group.id);
+            getChatGroup(group.id);
         })
     }, [username, navigate]);
 
@@ -155,6 +166,11 @@ function Whatsapp() {
     const setAllMessagesInChat  = (allMessages, chatId) => {
         setChats(chats => chats.map(chat => chat.id === chatId? 
             {...chat, allMessages}: chat));
+    }
+
+    const setUsersGroup = (groupId, users) => {
+        setGroups(prevGroups => prevGroups.map(group => 
+            group.id === groupId ? {...group, users} : group));
     }
 
     const sendMessageFromUser = (message) => {
@@ -180,6 +196,17 @@ function Whatsapp() {
         addChatGroup(group.id);
     }
 
+    useEffect(() => {
+        if(selectedChatId) {
+            let chat = chats.find(chat => chat.id === selectedChatId);
+            if(chat.groupId) {
+                setSelectedGroup(groups.find(group => group.id === chat.groupId));
+            } else {
+                setSelectedGroup(null);
+            }
+        }
+    }, [selectedChatId, groups, chats]);
+
 
     return (
         <div className='whatsapp'>
@@ -193,12 +220,14 @@ function Whatsapp() {
              displayGroup={addGroup}
              updateProfile={setUser} />
             <ChatDisplay chat={selectedChatId&&chats.find(chat => chat.id === selectedChatId)}
+            group={selectedGroup}
             userId={user.id}
             addToDisplay={(message) => addMessageToChat(message, selectedChatId)}
             display={(messages) => setMessagesInChat(messages, selectedChatId)}
             setAllMessages={(allMessages) => setAllMessagesInChat(allMessages, selectedChatId)}
             updateMessage={(messageId, props) => changeMessageInChat(messageId, selectedChatId, props)}
             sendMessage={sendMessageFromUser}
+            setUsersGroup={setUsersGroup}
             deleteMassageToEveryone={deleteMassageToEveryone}
             deleteMessage={(messageId) => deleteMessageFromChat(selectedChatId, messageId)} />
         </div>

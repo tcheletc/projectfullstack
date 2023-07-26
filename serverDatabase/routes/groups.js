@@ -19,13 +19,19 @@ router.get('/:groupId', (req, res) => {
     getObjectById(groupId, res, 'groups_ join users_groups on id=groupId', 'Group')
 });
 
+router.get('/:groupId/users', (req, res) => {
+  const schema = Joi.object({
+    groupId: Joi.number().min(1)
+  });
+  const { groupId } = req.params;
+  getAllObjects(res, 'users_groups join users on userId=id', { groupId }, schema);
+})
+
 router.post('/', (req, res) => {
     const schema = Joi.object({
       name_: Joi.string().min(1).required(),
       userId: Joi.number().min(1).required(),
       users: Joi.array().required()
-      //phone: myCustomJoi.string().phoneNumber().required(),
-      //password_: Joi.string().min(6).required()
     });
   
     const { error } = schema.validate(req.body);
@@ -47,11 +53,21 @@ router.post('/', (req, res) => {
         const usersValuesClosure = users.map(u => `(?, ${results.insertId}, false)`).join(',');
         const usersQuery = `INSERT INTO users_groups
         values(?, ${results.insertId}, true),${usersValuesClosure}`;
+
+        const chatsValuesClosure = users.map(u => `(?, ${results.insertId})`).join(',');
+        const chatsQuery = `INSERT INTO chats(userId, groupId)
+        values${chatsValuesClosure}`;
         executeQuery(usersQuery, usersValues, (error, result) => {
           if (error) {
             res.status(500).json({ error });
           } else {
-            res.status(201).json({ message: `Group created successfully`, id: results.insertId });
+            executeQuery(chatsQuery, users, (error, result) => {
+              if (error) {
+                res.status(500).json({ error });
+              } else {
+                res.status(201).json({ message: `Group created successfully`, id: results.insertId });
+              }
+            });
           }
         });
       }
