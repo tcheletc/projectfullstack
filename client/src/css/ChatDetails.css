@@ -32,10 +32,17 @@ p {
     align-items: center;
 }
 
+.members {
+    display: flex;
+    flex-direction: column;
+}
+
 .group-members {
     display: flex;
     flex-direction: column;
     border-top: 1px solid skyblue;
+    max-height: 180px;
+    overflow-y: scroll;
 }
 
 .chat-details form {

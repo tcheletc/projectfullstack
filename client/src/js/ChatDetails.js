@@ -23,8 +23,10 @@ function ChatDetails({chat, goBack, users, userId}) {
                 <img src={groupImage} alt="תמונת קבוצה" />}
                 {chat.groupId ? <>
                     <h4>חברי הקבוצה</h4>
+                    <div className='members'>
                     <div className='group-members'>
                     {users.map(u => <MemberGroup key={u.id} user={u} me={u.id === userId} admin={admin} />)}
+                    </div>
                     {admin? <form onSubmit={handleAddClick}>
                         <input value={username} 
                             onChange={(e) => setUserName(e.target.value)}
