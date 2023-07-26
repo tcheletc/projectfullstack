@@ -1,7 +1,8 @@
 import { useCallback, useState } from 'react';
 import {BiArrowBack} from 'react-icons/bi';
 import fetchServer from './fetchServer';
-import { MdDelete } from 'react-icons/md';
+import { MdDelete, MdAdd } from 'react-icons/md';
+import { GrAdd } from 'react-icons/gr';
 import '../css/AddGroup.css';
 
 function AddGroup({goBack, userId, username, displayGroup, user}) {
@@ -108,13 +109,13 @@ function AddGroup({goBack, userId, username, displayGroup, user}) {
                 <input value={name_} onChange={(({target}) => setName(target.value))} required /></label><br />
                 <h4><strong>חברי הקבוצה: </strong></h4>
                 {users.map((user, index) => 
-                    <div key={index} className='member-group'>
+                    <div key={index} className='mem-group'>
                         <input value={user.username} 
                         onChange={(e) => handleUsernameChange(e.target.value, index)}
                         placeholder='שם משתמש' required />
                         <MdDelete className="icon" onClick={() => handleRemoveClick(index)} />
                     </div>)}
-                <button type='button' onClick={handleAddClick}>+הוספת חבר לקבוצה</button>
+                <button type='button' onClick={handleAddClick}><MdAdd />הוספת חבר לקבוצה</button>
                 <button type='submit'>יצירת הקבוצה</button>
             </form>
             </div>

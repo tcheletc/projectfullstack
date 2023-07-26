@@ -32,6 +32,41 @@ p {
     align-items: center;
 }
 
+.group-members {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid skyblue;
+}
+
+.chat-details form {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.chat-details form input {
+    flex: 1;
+    font-family: inherit;
+    padding: 5px;
+}
+
+.chat-details form button {
+    font-size: inherit;
+    background: none;
+    border: none;
+}
+
+.chat-details .icon {
+    color: rgb(42, 220, 160);
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.chat-details .icon:hover {
+    color: rgb(19, 185, 130);
+}
+
 @media only screen and (max-width: 765px) {
     .chat-details {
         padding-right: 35px;

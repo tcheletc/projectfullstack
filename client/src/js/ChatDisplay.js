@@ -105,6 +105,12 @@ function ChatDisplay({chat, group, addToDisplay, sendMessage, display, setAllMes
         }
     }, [chat?.messages?.length]);
 
+    useEffect(() => {
+        if(!fullDesc) {
+            ref?.current?.scrollTo({top: ref.current.scrollHeight - scroll});
+        }
+    }, [fullDesc]);
+
 
     const handleScroll = (e) => {
         setScroll(e.currentTarget.scrollHeight - e.currentTarget.scrollTop);
@@ -181,7 +187,7 @@ function ChatDisplay({chat, group, addToDisplay, sendMessage, display, setAllMes
     return (
         <div className="chat-display">
             {!fullDesc ? (<div className={"chat-display"+(chat?'': ' unvisible')} >
-                <ChatDescribe chat={chat} setFullDesc={() => setFullDesc(true)} />
+                <ChatDescribe chat={chat} setFullDesc={() => setFullDesc(true)} userId={userId} />
                 <div className="chat-messages" ref={ref} onScroll={handleScroll}>
                     {chat&&(indexNew > -1? mapMessagesToElements(chat.messages.slice(0, indexNew))
                         : mapMessagesToElements(chat.messages))}
@@ -197,7 +203,7 @@ function ChatDisplay({chat, group, addToDisplay, sendMessage, display, setAllMes
                     <IoMdSend className="send" onClick={addMessage}/>
                 </div>
             </div>) : (<>{chat ? (<ChatDetails chat={chat}
-            goBack={() => setFullDesc(false)} users={group&&group.users} />) : <></>}</>)}
+            goBack={() => setFullDesc(false)} users={group&&group.users} userId={userId} />) : <></>}</>)}
         </div>
         
     )

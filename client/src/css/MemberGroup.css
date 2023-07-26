@@ -1,0 +1,35 @@
+.member-group {
+    display: flex;
+    padding: 5px;
+    border: 1px solid skyblue;
+    border-top: none;
+    align-items: center;
+    gap: 10px;
+}
+
+.member-group .name {
+    flex: 1;
+    padding: 5px;
+}
+
+.member-group .is_admin {
+    background-color: rgb(21, 161, 216);
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.member-group button {
+    cursor: pointer;
+    font-family: inherit;
+    background-color: rgb(58, 175, 222);
+    border: none;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.member-group button:hover {
+    background-color: rgb(206, 226, 235);
+    color: #3b5998;
+}

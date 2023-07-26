@@ -19,6 +19,17 @@
     cursor: pointer;
 }
 
+.chat-desc .leave-icon {
+    margin-right: auto;
+    cursor: pointer;
+    color: #5782e0;
+    font-size: 20px;
+}
+
+.chat-desc .leave-icon:hover {
+    color: #3b5998;
+}
+
 @media only screen and (max-width: 550px) {
     .chat-desc {
         padding-right: 35px;

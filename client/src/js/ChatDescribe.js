@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { MdGroup, MdPerson } from 'react-icons/md';
+import { FiLogOut } from 'react-icons/fi';
+import fetchServer from './fetchServer';
 import '../css/ChatDescribe.css';
 
-function ChatDescribe({chat, setFullDesc}) {
+function ChatDescribe({chat, setFullDesc, userId}) {
     const [name, setName] = useState('');
 
     useEffect (() => {
@@ -20,10 +22,28 @@ function ChatDescribe({chat, setFullDesc}) {
         setName(name_);
     }, [chat]);
 
+    const leaveGroup = () => {
+        const ok = window.confirm("האם אתם בטוחים שאתם רוצים לצאת מהקבוצה?");
+        if(ok) {
+            fetchServer(`/groups/${chat?.groupId}/users/${userId}`, (result, error, status) => {
+                if(error) {
+                    if(status === 404) {
+                        alert("אינך נמצא בקבוצה זו במערכת")
+                    } else
+                    alert(`שגיאה${status||''}: היציאה מהקבוצה נכשלה`);
+                } else {
+                    //deleteFromDisplay();
+                }
+            }, 'DELETE')
+        }
+    }
+
     return (
         <div className="chat-desc">
             {chat&&chat.groupId? <MdGroup className='icon' /> : <MdPerson className='icon' />}
             <span onClick={setFullDesc}>{name}</span>
+            {chat?.groupId?
+            <FiLogOut className="leave-icon" title="יציאה מהקבוצה" onClick={leaveGroup} />:<></>}
         </div>
     );
 }

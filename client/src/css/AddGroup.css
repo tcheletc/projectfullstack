@@ -2,21 +2,61 @@
     padding: 10px;
 }
 
-.member-group {
+.mem-group {
     display: flex;
+    align-items: center;
+    padding: 5px;
+    gap: 5px;
 }
 
-.member-group input {
+.mem-group input {
     flex: 1;
 }
 
-.member-group .icon {
+.mem-group .icon {
     height: 100%;
     font-size: 20px;
     color: hsl(347, 51%, 55%);
     cursor: pointer;
 }
 
-.member-group .icon:hover {
+.mem-group .icon:hover {
     color: rgb(174, 57, 82);
+}
+
+.add-group button[type="button"] {
+    font-family: inherit;
+    font-weight: bold;
+    width: 92%;
+    border-radius: 10px;
+    background-color: rgb(42, 220, 160);
+    cursor: pointer;
+    border: none;
+    margin: 5% 0 5% 5%;
+    padding: 5px;
+}
+
+.add-group button[type="button"]:hover {
+    background-color: rgb(19, 185, 130);
+    color: white;
+}
+
+.add-group button[type="submit"] {
+    font-family: inherit;
+    font-weight: bold;
+    border-radius: 10px;
+    background-color: skyblue;
+    cursor: pointer;
+    border: none;
+    padding: 10px;
+}
+
+.add-group button[type="submit"]:hover {
+    background-color: rgb(65, 174, 218);
+    color: white;
+}
+
+.add-group input {
+    font-family: inherit;
+    padding: 3px;
 }
