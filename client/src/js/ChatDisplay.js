@@ -7,12 +7,13 @@ import ChatDescribe from "./ChatDescribe";
 import ChatDetails from './ChatDetails';
 
 function ChatDisplay({chat, group, addToDisplay, sendMessage, display, setAllMessages,
-     updateMessage, deleteMessage, deleteMassageToEveryone, userId, setUsersGroup}) {
+     updateMessage, deleteMessage, deleteMassageToEveryone, userId, setUsersGroup, displayLeaveGroup}) {
     const [text, setText] = useState('');
     const [shift, setShift] = useState(false);
     const [fullDesc, setFullDesc] = useState(false);
     const [indexNew, setIndexNew] = useState(-1);
     const [scroll, setScroll] = useState(0);
+    const [startMessages, setStartMessages] = useState(0);
     const [onBottom, setOnBottom] = useState(false);
     const ref = useRef(null);
     const refNewMsg = useRef(null);
@@ -22,7 +23,7 @@ function ChatDisplay({chat, group, addToDisplay, sendMessage, display, setAllMes
         lastChildElement?.scrollIntoView(/* { behavior: 'smooth' } */);
     };
 
-    const getNextMessages = () => {
+    const getNextMessages = (callback = () => {}) => {
         fetchServer(`/messages?chatId=${chat.id}&reverse=true&limit=20&offset=${chat.messages.length}`,
         (result, error, status) => {
             if(error) {
@@ -32,6 +33,7 @@ function ChatDisplay({chat, group, addToDisplay, sendMessage, display, setAllMes
                 if(result.length < 20) {
                     setAllMessages(true);
                 }
+                callback();
             }
         })
     }
@@ -68,6 +70,7 @@ function ChatDisplay({chat, group, addToDisplay, sendMessage, display, setAllMes
     }, [chat?.groupId, group]);
 
     useEffect(() => {
+        setStartMessages(chat?.messages?.length);
         const index = chat?.messages?.findIndex(m => !m.is_read);
         setIndexNew(index);
         if( index > -1) {
@@ -82,16 +85,18 @@ function ChatDisplay({chat, group, addToDisplay, sendMessage, display, setAllMes
 
     useEffect(() => {
         if(chat && chat.messages.length < 20 && !chat.allMessages) {
-            getNextMessages();
+            const numMessages = chat.messages.length + 20;
+            getNextMessages(() => setStartMessages(numMessages));
         }
     }, [chat]);
+    
 
     useEffect(() => {
         if(chat) {
             const index = chat.messages.findIndex(m => !m.is_read);
             setIndexNew(index);
             if(index > -1) {
-                if(onBottom) {
+                if(onBottom && startMessages !== chat.messages.length) {
                     readMessages();
                 } else {
                     readMessages(true, index);
@@ -187,7 +192,8 @@ function ChatDisplay({chat, group, addToDisplay, sendMessage, display, setAllMes
     return (
         <div className="chat-display">
             {!fullDesc ? (<div className={"chat-display"+(chat?'': ' unvisible')} >
-                <ChatDescribe chat={chat} setFullDesc={() => setFullDesc(true)} userId={userId} />
+                <ChatDescribe chat={chat} setFullDesc={() => setFullDesc(true)} userId={userId}
+                    deleteFromDisplay={() => displayLeaveGroup(chat?.groupId)} />
                 <div className="chat-messages" ref={ref} onScroll={handleScroll}>
                     {chat&&(indexNew > -1? mapMessagesToElements(chat.messages.slice(0, indexNew))
                         : mapMessagesToElements(chat.messages))}

@@ -4,7 +4,7 @@ import { FiLogOut } from 'react-icons/fi';
 import fetchServer from './fetchServer';
 import '../css/ChatDescribe.css';
 
-function ChatDescribe({chat, setFullDesc, userId}) {
+function ChatDescribe({chat, setFullDesc, userId, deleteFromDisplay}) {
     const [name, setName] = useState('');
 
     useEffect (() => {
@@ -23,7 +23,7 @@ function ChatDescribe({chat, setFullDesc, userId}) {
     }, [chat]);
 
     const leaveGroup = () => {
-        const ok = window.confirm("האם אתם בטוחים שאתם רוצים לצאת מהקבוצה?");
+        const ok = window.confirm("האם אתם בטוחים שאתם רוצים לצאת מהקבוצה (ובכך למחוק גם את כל הצ'אט שלה)?");
         if(ok) {
             fetchServer(`/groups/${chat?.groupId}/users/${userId}`, (result, error, status) => {
                 if(error) {
@@ -32,9 +32,9 @@ function ChatDescribe({chat, setFullDesc, userId}) {
                     } else
                     alert(`שגיאה${status||''}: היציאה מהקבוצה נכשלה`);
                 } else {
-                    //deleteFromDisplay();
+                    deleteFromDisplay();
                 }
-            }, 'DELETE')
+            }, 'DELETE');
         }
     }
 

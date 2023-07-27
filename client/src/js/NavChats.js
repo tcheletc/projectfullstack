@@ -53,7 +53,7 @@ function NavChats({user, chats, selectedChatId, addToDisplay, selectChat,
     }
 
     const logout = () => {
-        disconnectServer();
+        // disconnectServer();
         sessionStorage.removeItem('user');
         navigate('/login');
     }

@@ -36,6 +36,10 @@ io.on('connection', socket => {
         });
     })
 
+    socket.on('leave_group',( groupId, userId) => {
+        socket.to(`group${groupId}`).emit('left_group', groupId, userId);
+    })
+
     socket.on('join_room', (room) => {
         socket.join(room);
     });

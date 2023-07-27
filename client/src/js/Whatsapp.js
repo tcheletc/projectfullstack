@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom'
 import io from 'socket.io-client'
 import fetchServer from './fetchServer';
@@ -12,19 +12,42 @@ function Whatsapp() {
     const { username } = useParams();
     const navigate = useNavigate(); // Access the navigate function
     const [user, setUser] = useState({});
+    // const socket = useMemo(() => io.connect('http://localhost:4000'), []);
     const [groups, setGroups] = useState([]);
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [chats, setChats] = useState([]);
     const [selectedChatId, setSelectedChatId] = useState(null);
     const [playing, setPlaying] = useAudio('http://novastar-main.co.hays.tx.us/NovaStar5/sounds/newmessage.wav');
 
+    // useEffect(() => {
+    //     return () => {
+    //         socket.emit('disconnct');
+    //     }
+    // }, []);
     const addMessageToChat = (message, chatId) => {
         setChats(chats => chats.map(chat => chat.id === chatId? 
-            {...chat, messages: chat.messages.concat([message])}: chat));
+            {...chat, messages: chat.messages.some(m => m.id === message.id)? chat.messages
+                : chat.messages.concat([message])}: chat));
     }
 
     const addChat = (chat) => {
         setChats(chats => chats.concat([chat]));
+    }
+
+    const deleteChat = (chatId) => {
+        setChats(chats => chats.filter(chat => chat.id !== chatId));
+    }
+
+    const leaveGroup = (groupId) => {
+        socket.emit('leave_room', `group${groupId}`);
+        setSelectedChatId(0);
+        setChats(chats => chats.filter(chat => chat?.groupId !== groupId));
+        setGroups(groups => groups.filter(group => group.id !== groupId));
+    }
+
+    const removeUserFromGroup = (groupId, userId) => {
+        setGroups(groups => groups.map(group => group.id === groupId ? 
+            {...group, users: group.users?.filter(u => u.id !== userId)} : group));
     }
 
     const changeMessageInChat = (messageId, chatId, props) => {
@@ -60,7 +83,7 @@ function Whatsapp() {
                 }
             });
         } else {
-            const group = groups.find(g => g.id === chat.groupId);
+            const group = groups.find(g => g.id === chat?.groupId);
             setChats(prevChats => [...prevChats, {...chat, name_: group.name_}]);
         }
     }, []);
@@ -118,6 +141,9 @@ function Whatsapp() {
         });
 
         socket.emit('join_room', user.id);
+    }, [username, navigate, socket]);
+
+    useEffect(() => {
         socket.on('receive_message', message => {
             //TO-DO: add code for other options
             if(playing) {
@@ -128,6 +154,11 @@ function Whatsapp() {
                 if(chats.some(chat => chat.partnerId === message.senderId)) {
                     let chat = chats.find(chat => chat.partnerId === message.senderId);
                     console.log(message, chat);
+                    addMessageToChat({...message, chatId: chat.id}, chat.id);
+                }
+            } else {
+                let chat = chats.find(chat => chat.groupId === message.groupId);
+                if(chat) {
                     addMessageToChat({...message, chatId: chat.id}, chat.id);
                 }
             }
@@ -152,11 +183,17 @@ function Whatsapp() {
             socket.emit('join_room', `group${group.id}`);
             getChatGroup(group.id);
         })
-    }, [username, navigate]);
 
-    const deleteChat = (chatId) => {
-        setChats(chats => chats.filter(chat => chat.id !== chatId));
-    }
+        socket.on('left_group', (groupId, userId) => {
+            if(userId === user.id) {
+                leaveGroup(groupId);
+            } else {
+                removeUserFromGroup(groupId, userId);
+            }
+        })
+
+    }, [chats, groups, socket]);
+
 
     const deleteMessageFromChat = (chatId, messageId) => {
         setChats(chats => chats.map(chat => chat.id === chatId? 
@@ -179,6 +216,10 @@ function Whatsapp() {
         socket.emit('send_message', message, room);
     }
 
+    const sendLeaveGroup = (groupId, userId) => {
+        socket.emit('leave_group', groupId, userId);
+    }
+
     const deleteMassageToEveryone = (messageId) => {
         let chat = chats.find(chat => chat.id === selectedChatId)
         let room = chat.partnerId||`group${chat.groupId}`;
@@ -191,7 +232,7 @@ function Whatsapp() {
 
     const addGroup = (group) => {
         setGroups(prevGroups => prevGroups.concat([group]));
-        socket.emit('add_group', group, group.users.filter(u => u.id != user.id));
+        socket.emit('add_group', group, group.users.filter(u => u.id !== user.id));
         socket.emit('join_room', `group${group.id}`);
         addChatGroup(group.id);
     }
@@ -199,7 +240,7 @@ function Whatsapp() {
     useEffect(() => {
         if(selectedChatId) {
             let chat = chats.find(chat => chat.id === selectedChatId);
-            if(chat.groupId) {
+            if(chat?.groupId) {
                 setSelectedGroup(groups.find(group => group.id === chat.groupId));
             } else {
                 setSelectedGroup(null);
@@ -228,6 +269,7 @@ function Whatsapp() {
             updateMessage={(messageId, props) => changeMessageInChat(messageId, selectedChatId, props)}
             sendMessage={sendMessageFromUser}
             setUsersGroup={setUsersGroup}
+            displayLeaveGroup={(groupId) => {sendLeaveGroup(groupId, user.id); leaveGroup(groupId)}}
             deleteMassageToEveryone={deleteMassageToEveryone}
             deleteMessage={(messageId) => deleteMessageFromChat(selectedChatId, messageId)} />
         </div>

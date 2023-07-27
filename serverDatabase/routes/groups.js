@@ -76,15 +76,30 @@ router.post('/', (req, res) => {
 
   router.delete('/:groupId/users/:userId', (req, res) => {
     const { groupId, userId } = req.params;
-    const query = `DELETE FROM users_groups WHERE groupId=? and userId=?`
-    executeQuery(query, [groupId, userId], (result, error) => {
+    const groupQuery = `DELETE FROM users_groups WHERE groupId=? and userId=?`;
+    const messagesQuery = `DELETE FROM messages_chats WHERE chatId IN 
+    (SELECT id FROM chats WHERE groupId=? and userId=?)`;
+    const chatQuery = `DELETE FROM chats WHERE groupId=? and userId=?`;
+    executeQuery(groupQuery, [groupId, userId], (result, error) => {
       if(error) {
         res.status(500).json({ error });
       } else {
         if(result.affectedRows === 0) {
           res.status(404).json({error: 'User is not in the group'})
         } else {
-          res.json({ message: `User deleted from group successfully`});
+          executeQuery(messagesQuery, [groupId, userId], (result, error) => {
+            if(error) {
+              res.status(500).json({ error });
+            } else {
+                executeQuery(chatQuery, [groupId, userId], (result, error) => {
+                  if(error) {
+                    res.status(500).json({ error });
+                  } else {
+                      res.json({ message: `User deleted from group successfully`});
+                  }
+                })
+            }
+          })
         }
       }
     })

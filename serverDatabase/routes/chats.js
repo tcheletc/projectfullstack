@@ -57,9 +57,29 @@ router.put('/:chatId/read', (req, res) => {
     });
 });
 
+const deleteChatMessages = (chatId, res, callback) => {
+  const query = `DELETE FROM messages_chats WHERE chatId=?`
+  executeQuery(query, [chatId], (error, result) => {
+    if(error) {
+      res.status(500).json({ error });
+    } else {
+      callback();
+    }
+  })
+}
+
 router.delete('/:chatId', (req, res) => {
     const { chatId } = req.params;
-    deleteObjectById(chatId, res, 'chats', 'Chat');
+    deleteChatMessages(chatId, res, () => {
+      deleteObjectById(chatId, res, 'chats', 'Chat');
+    })
+});
+
+router.delete('/:chatId/messages', (req, res) => {
+  const { chatId } = req.params;
+  deleteChatMessages(chatId, res, () => {
+    res.json({message: 'Chat messages deleted successfully'});
+  })
 });
 
 router.delete('/:chatId/messages/:messageId', (req, res) => {
