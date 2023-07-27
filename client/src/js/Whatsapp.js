@@ -19,11 +19,12 @@ function Whatsapp() {
     const [selectedChatId, setSelectedChatId] = useState(null);
     const [playing, setPlaying] = useAudio('http://novastar-main.co.hays.tx.us/NovaStar5/sounds/newmessage.wav');
 
-    // useEffect(() => {
-    //     return () => {
-    //         socket.emit('disconnct');
-    //     }
-    // }, []);
+    useEffect(() => {
+        return () => {
+            socket.emit('leave_room', user.id);
+            groups.forEach(group =>socket.emit('leave_room', `group${group.id}`));
+        }
+    }, []);
     const addMessageToChat = (message, chatId) => {
         setChats(chats => chats.map(chat => chat.id === chatId? 
             {...chat, messages: chat.messages.some(m => m.id === message.id)? chat.messages
@@ -150,7 +151,7 @@ function Whatsapp() {
                 setPlaying(false)
             }
             setPlaying(true);
-            if(message.partnerId) {
+            if(!message.groupId) {
                 if(chats.some(chat => chat.partnerId === message.senderId)) {
                     let chat = chats.find(chat => chat.partnerId === message.senderId);
                     console.log(message, chat);
@@ -227,7 +228,8 @@ function Whatsapp() {
     }
 
     const disconnectServer = () => {
-        socket.emit('disconnct');
+        socket.emit('leave_room', user.id);
+        groups.forEach(group =>socket.emit('leave_room', `group${group.id}`));
     }
 
     const addGroup = (group) => {
