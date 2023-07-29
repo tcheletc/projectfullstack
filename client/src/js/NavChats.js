@@ -11,7 +11,7 @@ import Profile from './Profile';
 import AddGroup from "./AddGroup";
 
 function NavChats({user, chats, selectedChatId, addToDisplay, selectChat,
-     deleteFromDisplay, updateProfile, disconnectServer, displayGroup}) {
+     deleteFromDisplay, updateProfile, displayGroup}) {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [open, setOpen] = useState(false);
@@ -53,7 +53,6 @@ function NavChats({user, chats, selectedChatId, addToDisplay, selectChat,
     }
 
     const logout = () => {
-        disconnectServer();
         sessionStorage.removeItem('user');
         navigate('/login');
     }

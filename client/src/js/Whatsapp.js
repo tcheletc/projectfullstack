@@ -89,24 +89,24 @@ function Whatsapp() {
         }
     }, []);
 
-    const addChatGroup = (groupId) => {
-        const chat = {userId: user.id, groupId};
+    const addChatGroup = (group) => {
+        const chat = {userId: user.id, groupId: group.id};
         fetchServer(`/chats`, (res, err, stat) => {
             if(err) {
                 alert(`שגיאה${stat}: הוספת הצ'אט לקבוצה נכשלה`);
             } else {
-                addChat({...chat, id: res.id, messages: []});
+                addChat({...chat, name_: group.name_, id: res.id, messages: []});
             }
         }, 'POST', 
         JSON.stringify(chat), { 'Content-Type': 'application/json'});
     }
 
-    const getChatGroup = (groupId) => {
-        fetchServer(`/chats?userId=${user.id}&groupId=${groupId}&limit=1`, (res, err, stat) => {
+    const getChatGroup = (group) => {
+        fetchServer(`/chats?userId=${user.id}&groupId=${group.id}&limit=1`, (res, err, stat) => {
             if(err) {
-                alert(`שגיאה${stat}: טעינת הצ''אט של הקבוצה ${groupId} נכשלה`);
+                alert(`שגיאה${stat}: טעינת הצ''אט של הקבוצה ${group.id} נכשלה`);
             } else {
-                addChat({...res, messages: []});
+                addChat({...res, name_: group.name_, messages: []});
             }
         })
     }
@@ -209,7 +209,7 @@ function Whatsapp() {
         socket.on('join_group', group => {
             setGroups(prevGroups => prevGroups.concat([group]));
             socket.emit('join_room', `group${group.id}`);
-            getChatGroup(group.id);
+            getChatGroup(group);
         })
 
         socket.on('left_group', (groupId, userId) => {
@@ -258,16 +258,11 @@ function Whatsapp() {
         socket.emit('delete_message', {id: messageId, senderId: user.id, groupId: chat.groupId}, room);
     }
 
-    const disconnectServer = () => {
-        socket.emit('leave_room', user.id);
-        groups.forEach(group =>socket.emit('leave_room', `group${group.id}`));
-    }
-
     const addGroup = (group) => {
         setGroups(prevGroups => prevGroups.concat([group]));
         socket.emit('add_group', group, group.users.filter(u => u.id !== user.id));
         socket.emit('join_room', `group${group.id}`);
-        addChatGroup(group.id);
+        addChatGroup(group);
     }
 
     useEffect(() => {
@@ -281,7 +276,6 @@ function Whatsapp() {
         }
     }, [selectedChatId, groups, chats]);
 
-
     return (
         <div className='whatsapp'>
             <NavChats user={user}
@@ -289,7 +283,6 @@ function Whatsapp() {
              selectedChatId={selectedChatId}
              selectChat={setSelectedChatId}
              addToDisplay={addChat}
-             disconnectServer={disconnectServer}
              deleteFromDisplay={deleteChat}
              displayGroup={addGroup}
              updateProfile={setUser} />

@@ -16,9 +16,9 @@ function MemberGroup({user, me, admin}) {
             <button onClick={toggleAdmin}>
                 {user.is_admin? 'הסרה מניהול הקבוצה' : 'הגדר/י כמנהל/ת קבוצה'}
             </button>
-            <button onClick={removeFromGroup}>
+            {!me?<button onClick={removeFromGroup}>
                 הסרה מהקבוצה
-            </button>
+            </button>:<></>}
             </>: <></>}
         </div>
     )

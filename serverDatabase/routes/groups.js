@@ -80,18 +80,18 @@ router.post('/', (req, res) => {
     const messagesQuery = `DELETE FROM messages_chats WHERE chatId IN 
     (SELECT id FROM chats WHERE groupId=? and userId=?)`;
     const chatQuery = `DELETE FROM chats WHERE groupId=? and userId=?`;
-    executeQuery(groupQuery, [groupId, userId], (result, error) => {
+    executeQuery(groupQuery, [groupId, userId], (error, result) => {
       if(error) {
         res.status(500).json({ error });
       } else {
         if(result.affectedRows === 0) {
           res.status(404).json({error: 'User is not in the group'})
         } else {
-          executeQuery(messagesQuery, [groupId, userId], (result, error) => {
+          executeQuery(messagesQuery, [groupId, userId], (error, result) => {
             if(error) {
               res.status(500).json({ error });
             } else {
-                executeQuery(chatQuery, [groupId, userId], (result, error) => {
+                executeQuery(chatQuery, [groupId, userId], (error, result) => {
                   if(error) {
                     res.status(500).json({ error });
                   } else {
