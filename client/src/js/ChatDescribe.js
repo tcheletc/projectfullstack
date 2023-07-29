@@ -40,7 +40,7 @@ function ChatDescribe({chat, setFullDesc, userId, deleteFromDisplay}) {
 
     return (
         <div className="chat-desc">
-            {chat&&chat.groupId? <MdGroup className='icon' /> : <MdPerson className='icon' />}
+            {chat&&chat.groupId? <MdGroup className='chat-icon' /> : <MdPerson className='chat-icon' />}
             <span onClick={setFullDesc}>{name}</span>
             {chat?.groupId?
             <FiLogOut className="leave-icon" title="יציאה מהקבוצה" onClick={leaveGroup} />:<></>}

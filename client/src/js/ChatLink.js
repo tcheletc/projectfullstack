@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import '../css/ChatLink.css';
 import fetchServer from "./fetchServer";
-import {MdDelete} from 'react-icons/md'
+import { MdDelete, MdGroup, MdPerson } from 'react-icons/md';
 
 function ChatLink({chat, selected, selectChat, deleteFromDisplay}) {
     const [name, setName] = useState('');
@@ -17,12 +17,21 @@ function ChatLink({chat, selected, selectChat, deleteFromDisplay}) {
             name_ = name_.slice(0, 17) + '...';
         }
         setName(name_);
-    }, [chat?.fullname, chat?.name]);
+    }, [chat?.fullname, chat?.name_]);
 
     const deleteChat = () => {
-        const ok = window.confirm("האם אתם בטוחים שאתם רוצים למחוק את הצ'אט?");
+        let deleted = "הצ'אט";
+        if(chat.groupId) {
+            deleted = "כל ההודעות בקבוצה"
+        }
+        const ok = window.confirm(`האם אתם בטוחים שאתם רוצים למחוק את ${deleted}?`);
+        if(chat.groupId) {
+            deleted = "/messages";
+        } else {
+            deleted = "";
+        }
         if(ok) {
-            fetchServer(`/chats/${chat.id}`, (result, error, status) => {
+            fetchServer(`/chats/${chat.id}${deleted}`, (result, error, status) => {
                 if(error) {
                     if(status === 404) {
                         alert("הצ'אט לא קיים במערכת")
@@ -38,6 +47,7 @@ function ChatLink({chat, selected, selectChat, deleteFromDisplay}) {
 
     return (
         <div className={"chat-link" + (selected?' selected': '')} onClick={selectChat}>
+            {chat?.groupId? <MdGroup className='chat-icon' /> : <MdPerson className='chat-icon' />}
             <div className="name">{name}</div>
             {newMessages > 0? <div className="num-new-messages">{newMessages}</div>: <></>}
             <MdDelete className="icon" onClick={deleteChat} />

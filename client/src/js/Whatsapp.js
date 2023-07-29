@@ -12,7 +12,6 @@ function Whatsapp() {
     const { username } = useParams();
     const navigate = useNavigate(); // Access the navigate function
     const [user, setUser] = useState({});
-    // const socket = useMemo(() => io.connect('http://localhost:4000'), []);
     const [groups, setGroups] = useState([]);
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [chats, setChats] = useState([]);
@@ -25,6 +24,7 @@ function Whatsapp() {
             groups.forEach(group =>socket.emit('leave_room', `group${group.id}`));
         }
     }, []);
+    
     const addMessageToChat = (message, chatId) => {
         setChats(chats => chats.map(chat => chat.id === chatId? 
             {...chat, messages: chat.messages.some(m => m.id === message.id)? chat.messages
@@ -111,6 +111,24 @@ function Whatsapp() {
         })
     }
 
+    const setChatPartner = (partnerId, message) => {
+        fetchServer(`/chats?userId=${user.id}&partnerId=${partnerId}&limit=1`, (res, err, stat) => {
+            if(err) {
+                alert(`שגיאה${stat}: טעינת הצ''אט של השותף ${partnerId} נכשלה`);
+            } else {
+                fetchServer(`/users/${partnerId}`, (result, error, status) => {
+                    if(error) {
+                        alert(`שגיאה${stat}: טעינת פרטי השותף של הצ'אט ${partnerId} נכשלה`);
+                    } else {
+                        const {username, fullname, email, phone} = result
+                        addChat({...res, username, fullname, email
+                            ,phone , messages: [{...message, chatId: res.id}]});
+                    }
+                });
+            }
+        })
+    }
+
     useEffect(() => {
         const userString = sessionStorage.getItem("user");
         if(!userString) {
@@ -142,6 +160,10 @@ function Whatsapp() {
         });
 
         socket.emit('join_room', user.id);
+        return () => {
+            socket.emit('leave_room', user.id);
+            groups.forEach(group =>socket.emit('leave_room', `group${group.id}`));
+        }
     }, [username, navigate, socket]);
 
     useEffect(() => {
@@ -152,10 +174,15 @@ function Whatsapp() {
             }
             setPlaying(true);
             if(!message.groupId) {
-                if(chats.some(chat => chat.partnerId === message.senderId)) {
-                    let chat = chats.find(chat => chat.partnerId === message.senderId);
-                    console.log(message, chat);
-                    addMessageToChat({...message, chatId: chat.id}, chat.id);
+                let chat = chats.find(chat => chat.partnerId === message.senderId);
+                if(chat) {
+                    if(!chat.messages.some(m => m.id === message.id)) {
+                        addMessageToChat({...message, chatId: chat.id}, chat.id);
+                    }
+                } else {
+                    //if(!chats.some(chat => chat.partnerId === message.senderId)) {
+                        setChatPartner(message.senderId, message);
+                    //}
                 }
             } else {
                 let chat = chats.find(chat => chat.groupId === message.groupId);
@@ -191,9 +218,13 @@ function Whatsapp() {
             } else {
                 removeUserFromGroup(groupId, userId);
             }
-        })
+        });
 
-    }, [chats, groups, socket]);
+        return () => {
+            socket.removeAllListeners();
+        }
+
+    }, [chats, groups, socket, setChatPartner]);
 
 
     const deleteMessageFromChat = (chatId, messageId) => {
