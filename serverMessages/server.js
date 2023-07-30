@@ -36,8 +36,17 @@ io.on('connection', socket => {
         });
     })
 
-    socket.on('leave_group',( groupId, userId) => {
+    socket.on('leave_group',(groupId, userId) => {
         socket.to(`group${groupId}`).emit('left_group', groupId, userId);
+    })
+
+    socket.on('change_admin', (groupId, userId) => {
+        socket.to(`group${groupId}`).emit('changed_admin', groupId, userId);
+    });
+
+    socket.on('add_user', (group, user) => {
+        socket.to(`group${group.id}`).emit('added_user', group.id, user);
+        socket.to(user.id).emit('join_group', {...group, users: group.users.concat(user)});
     })
 
     socket.on('join_room', (room) => {

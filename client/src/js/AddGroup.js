@@ -56,7 +56,6 @@ function AddGroup({goBack, userId, username, displayGroup, user}) {
             if(err) {
                 alert(`שגיאה${stat}: יצירת הקבוצה נכשלה`);
             } else {
-                alert('הקבוצה נוספה');
                 //ADD group to display
                 displayGroup({name_, 
                     users: users.map(u => ({...u, is_admin: false})).concat([{...user, is_admin: true}])

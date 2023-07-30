@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Joi = require('joi');
-const {getAllObjects, getObjectById, executeQuery, updateObjectById, deleteObjectById} = require('../mySQLconnection');
+const {getAllObjects, getObjectById, executeQuery, updateObjectById, deleteObjectById, createObject} = require('../mySQLconnection');
 
 router.get('/', (req, res) => {
     const schema = Joi.object({
@@ -74,8 +74,73 @@ router.post('/', (req, res) => {
     });
   });
 
+  router.post('/:groupId/users', (req, res) => {
+    const { groupId } = req.params;
+    const schema = Joi.object({
+      groupId: Joi.number().min(1).required(),
+      userId: Joi.number().min(1).required(),
+    });
+
+    const { error } = schema.validate({...req.body, groupId});
+    if (error) {
+      res.status(400).send(error.details[0].message);
+      return;
+    }
+    const {userId} = req.body;
+    const userQuery = 'INSERT INTO users_groups(groupId, userId, is_admin) values(?, ?, false)';
+    const chatQuery = 'INSERT INTO chats(userId, groupId) values(?, ?)';
+    executeQuery(userQuery, [groupId, userId], (error, result) => {
+      if(error) {
+        res.status(500).json({ error });
+      } else {
+        executeQuery(chatQuery, [userId, groupId], (error, result) => {
+          if(error) {
+            res.status(500).json({ error });
+          } else {
+              res.json({ message: `User added to group successfully`});
+          }
+        })
+      }
+    })
+  })
+
+  router.put('/:groupId/users/:userId', (req, res) => {
+    const { groupId, userId } = req.params;
+    const schema = Joi.object({
+      groupId: Joi.number().min(1).required(),
+      userId: Joi.number().min(1).required(),
+      is_admin: Joi.boolean().required()
+    });
+  
+    const { error } = schema.validate({...req.body, groupId, userId});
+    if (error) {
+      res.status(400).send(error.details[0].message);
+      return;
+    }
+
+    const {is_admin} = req.body;
+    const query = 'UPDATE users_groups SET is_admin=? WHERE groupId=? and userId=?';
+    executeQuery(query, [is_admin, groupId, userId], (error, result) => {
+      if(error) {
+        res.status(500).json({ error });
+      } else {
+          res.json({ message: `User changed In group successfully`});
+      }
+    })
+  })
+
   router.delete('/:groupId/users/:userId', (req, res) => {
     const { groupId, userId } = req.params;
+    const schema = Joi.object({
+      groupId: Joi.number().min(1).required(),
+      userId: Joi.number().min(1).required(),
+    });
+  
+    const { error } = schema.validate({groupId, userId});
+    if (error) {
+      res.status(400).send(error.details[0].message);
+      return;
+    }
     const groupQuery = `DELETE FROM users_groups WHERE groupId=? and userId=?`;
     const messagesQuery = `DELETE FROM messages_chats WHERE chatId IN 
     (SELECT id FROM chats WHERE groupId=? and userId=?)`;

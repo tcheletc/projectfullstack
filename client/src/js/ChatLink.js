@@ -3,7 +3,7 @@ import '../css/ChatLink.css';
 import fetchServer from "./fetchServer";
 import { MdDelete, MdGroup, MdPerson } from 'react-icons/md';
 
-function ChatLink({chat, selected, selectChat, deleteFromDisplay}) {
+function ChatLink({chat, selected, selectChat, deleteFromDisplay, deleteMessagesFromDisplay}) {
     const [name, setName] = useState('');
 
     useEffect (() => {
@@ -38,7 +38,11 @@ function ChatLink({chat, selected, selectChat, deleteFromDisplay}) {
                     } else
                     alert(`שגיאה${status||''}: מחיקת הצ'אט נכשלה`);
                 } else {
-                    deleteFromDisplay();
+                    if(chat.groupId) {
+                        deleteMessagesFromDisplay();
+                    } else {
+                        deleteFromDisplay();
+                    }
                 }
             }, 'DELETE')
         }

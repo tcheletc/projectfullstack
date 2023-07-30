@@ -41,7 +41,6 @@ function Whatsapp() {
 
     const leaveGroup = (groupId) => {
         socket.emit('leave_room', `group${groupId}`);
-        setSelectedChatId(0);
         setChats(chats => chats.filter(chat => chat?.groupId !== groupId));
         setGroups(groups => groups.filter(group => group.id !== groupId));
     }
@@ -49,6 +48,17 @@ function Whatsapp() {
     const removeUserFromGroup = (groupId, userId) => {
         setGroups(groups => groups.map(group => group.id === groupId ? 
             {...group, users: group.users?.filter(u => u.id !== userId)} : group));
+    }
+
+    const addUserToGroup = (groupId, user) => {
+        setGroups(groups => groups.map(group => group.id === groupId ? 
+            {...group, users: group.users.concat(user)} : group));
+    }
+
+    const changeAdminUserInGroup = (groupId, userId) => {
+        setGroups(groups => groups.map(group => group.id === groupId?
+            {...group, users: group.users.map(user => user.id === userId ? 
+                {...user, is_admin: !user.is_admin}: user)} : group));
     }
 
     const changeMessageInChat = (messageId, chatId, props) => {
@@ -168,7 +178,6 @@ function Whatsapp() {
 
     useEffect(() => {
         socket.on('receive_message', message => {
-            //TO-DO: add code for other options
             if(playing) {
                 setPlaying(false)
             }
@@ -180,9 +189,7 @@ function Whatsapp() {
                         addMessageToChat({...message, chatId: chat.id}, chat.id);
                     }
                 } else {
-                    //if(!chats.some(chat => chat.partnerId === message.senderId)) {
-                        setChatPartner(message.senderId, message);
-                    //}
+                    setChatPartner(message.senderId, message);
                 }
             } else {
                 let chat = chats.find(chat => chat.groupId === message.groupId);
@@ -220,6 +227,14 @@ function Whatsapp() {
             }
         });
 
+        socket.on('changed_admin', (groupId, userId) => {
+            changeAdminUserInGroup(groupId, userId);
+        });
+
+        socket.on('added_user', (groupId, user) => {
+            addUserToGroup(groupId, user);
+        })
+
         return () => {
             socket.removeAllListeners();
         }
@@ -250,6 +265,14 @@ function Whatsapp() {
 
     const sendLeaveGroup = (groupId, userId) => {
         socket.emit('leave_group', groupId, userId);
+    }
+
+    const sendChangeAdmin = (groupId, userId) => {
+        socket.emit('change_admin', groupId, userId);
+    }
+
+    const sendAddUser = (group, user) => {
+        socket.emit('add_user', group, user);
     }
 
     const deleteMassageToEveryone = (messageId) => {
@@ -284,6 +307,7 @@ function Whatsapp() {
              selectChat={setSelectedChatId}
              addToDisplay={addChat}
              deleteFromDisplay={deleteChat}
+             deleteMessagesFromDisplay={(chatId) => setMessagesInChat([], chatId)}
              displayGroup={addGroup}
              updateProfile={setUser} />
             <ChatDisplay chat={selectedChatId&&chats.find(chat => chat.id === selectedChatId)}
@@ -295,6 +319,9 @@ function Whatsapp() {
             updateMessage={(messageId, props) => changeMessageInChat(messageId, selectedChatId, props)}
             sendMessage={sendMessageFromUser}
             setUsersGroup={setUsersGroup}
+            displayAddUserToGroup={(group, user) => {sendAddUser(group, user); addUserToGroup(group.id, user)}}
+            displayRemoveUserFromGroup={(groupId, userId) => {sendLeaveGroup(groupId, userId); removeUserFromGroup(groupId, userId)}}
+            displayChangeAdminUserInGroup={(groupId, userId) => {sendChangeAdmin(groupId, userId); changeAdminUserInGroup(groupId, userId)}}
             displayLeaveGroup={(groupId) => {sendLeaveGroup(groupId, user.id); leaveGroup(groupId)}}
             deleteMassageToEveryone={deleteMassageToEveryone}
             deleteMessage={(messageId) => deleteMessageFromChat(selectedChatId, messageId)} />

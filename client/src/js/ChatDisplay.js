@@ -7,7 +7,8 @@ import ChatDescribe from "./ChatDescribe";
 import ChatDetails from './ChatDetails';
 
 function ChatDisplay({chat, group, addToDisplay, sendMessage, display, setAllMessages,
-     updateMessage, deleteMessage, deleteMassageToEveryone, userId, setUsersGroup, displayLeaveGroup}) {
+     updateMessage, deleteMessage, deleteMassageToEveryone, userId, setUsersGroup, displayLeaveGroup,
+     displayRemoveUserFromGroup, displayChangeAdminUserInGroup, displayAddUserToGroup}) {
     const [text, setText] = useState('');
     const [shift, setShift] = useState(false);
     const [fullDesc, setFullDesc] = useState(false);
@@ -208,8 +209,10 @@ function ChatDisplay({chat, group, addToDisplay, sendMessage, display, setAllMes
                     onKeyDown={handleKeyDown} />
                     <IoMdSend className="send" onClick={addMessage}/>
                 </div>
-            </div>) : (<>{chat ? (<ChatDetails chat={chat}
-            goBack={() => setFullDesc(false)} users={group&&group.users} userId={userId} />) : <></>}</>)}
+            </div>) : (<>{chat ? (<ChatDetails chat={chat} displayRemoveUserFromGroup={(userId) => displayRemoveUserFromGroup(chat?.groupId, userId)}
+            goBack={() => setFullDesc(false)} users={group&&group.users} userId={userId}
+            displayAddUserToGroup={(user) => displayAddUserToGroup(group, user)}
+            displayChangeAdminUserInGroup={(userId) => displayChangeAdminUserInGroup(chat?.groupId, userId)} />) : <></>}</>)}
         </div>
         
     )
