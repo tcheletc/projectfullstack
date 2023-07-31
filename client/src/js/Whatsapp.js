@@ -52,7 +52,7 @@ function Whatsapp() {
 
     const addUserToGroup = (groupId, user) => {
         setGroups(groups => groups.map(group => group.id === groupId ? 
-            {...group, users: group.users.concat(user)} : group));
+            {...group, users: group.users?.concat(user)} : group));
     }
 
     const changeAdminUserInGroup = (groupId, userId) => {
