@@ -19,12 +19,12 @@ function ChatDetails({chat, goBack, users, userId, displayRemoveUserFromGroup,
                 if(status === 404) {
                     alert('המשתמש לא קיים במערכת');
                 } else {
-                    alert(`שגיאה${status}: מציאת המשתמש במערכת נכשלה`);
+                    alert(`שגיאה${status||''}: מציאת המשתמש במערכת נכשלה`);
                 }
             } else {
                 fetchServer(`/groups/${chat?.groupId}/users`, (res, err, stat) => {
                     if(err) {
-                        alert(`שגיאה${stat}: הוספת המשתמש לקבוצה נכשלה`);
+                        alert(`שגיאה${stat||''}: הוספת המשתמש לקבוצה נכשלה`);
                     } else {
                         displayAddUserToGroup(result);
                     }

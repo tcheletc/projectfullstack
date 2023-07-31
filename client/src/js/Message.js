@@ -4,7 +4,7 @@ import { RiArrowDropDownLine, RiForbid2Line } from 'react-icons/ri';
 import { AiOutlineStop } from 'react-icons/ai'
 import fetchServer from './fetchServer'
 
-function Message({id, text, deleted, my, senderName, groupId, chatId, deleteMessage, deleteMessageFromChat}) {
+function Message({id, text, deleted, my, senderId, senderName, groupId, chatId, deleteMessage, deleteMessageFromChat}) {
     const [shown, setShown] = useState(false);
     const handleClickMenu = () => setShown(shown => !shown);
 
@@ -33,7 +33,7 @@ function Message({id, text, deleted, my, senderName, groupId, chatId, deleteMess
 
     return (
         <div className={"message" + (my? ' my': '')}>
-            <h3 className={(my||!groupId)?'unvisible':undefined}>{senderName}</h3>
+            <h3 className={(my||!groupId)?'unvisible':undefined}>{senderName||`משתמש/ת${senderId}`}</h3>
             <div className={deleted? 'unvisible' : undefined}>
                 <div className={"dropdown"+(!my? ' unvisible': '')}>
                     <RiArrowDropDownLine className="dropbtn" onClick={handleClickMenu} />

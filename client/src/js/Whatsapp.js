@@ -76,7 +76,7 @@ function Whatsapp() {
     const getChatMessages = useCallback((chat, groups, callback) => {
         fetchServer(`/messages?chatId=${chat.id}&is_read=false`, (res, err, stat) => {
             if(err) {
-                alert(`שגיאה${stat}: טעינת הודעות הצ'אט ${chat.id} שלא נקראו נכשלה`);
+                alert(`שגיאה${stat||''}: טעינת הודעות הצ'אט ${chat.id} שלא נקראו נכשלה`);
             } else {
                 callback({...chat, messages: res, allMessages: false}, groups);
             }
@@ -103,9 +103,9 @@ function Whatsapp() {
         const chat = {userId: user.id, groupId: group.id};
         fetchServer(`/chats`, (res, err, stat) => {
             if(err) {
-                alert(`שגיאה${stat}: הוספת הצ'אט לקבוצה נכשלה`);
+                alert(`שגיאה${stat||''}: הוספת הצ'אט לקבוצה נכשלה`);
             } else {
-                addChat({...chat, name_: group.name_, id: res.id, messages: []});
+                addChat({...chat, name_: group.name_, id: res.id, messages: [], allMessages: true});
             }
         }, 'POST', 
         JSON.stringify(chat), { 'Content-Type': 'application/json'});
@@ -114,9 +114,9 @@ function Whatsapp() {
     const getChatGroup = (group) => {
         fetchServer(`/chats?userId=${user.id}&groupId=${group.id}&limit=1`, (res, err, stat) => {
             if(err) {
-                alert(`שגיאה${stat}: טעינת הצ''אט של הקבוצה ${group.id} נכשלה`);
+                alert(`שגיאה${stat||''}: טעינת הצ''אט של הקבוצה ${group.id} נכשלה`);
             } else {
-                addChat({...res, name_: group.name_, messages: []});
+                addChat({...res, name_: group.name_, messages: [], allMessages: true});
             }
         })
     }
@@ -124,11 +124,11 @@ function Whatsapp() {
     const setChatPartner = (partnerId, message) => {
         fetchServer(`/chats?userId=${user.id}&partnerId=${partnerId}&limit=1`, (res, err, stat) => {
             if(err) {
-                alert(`שגיאה${stat}: טעינת הצ''אט של השותף ${partnerId} נכשלה`);
+                alert(`שגיאה${stat||''}: טעינת הצ''אט של השותף ${partnerId} נכשלה`);
             } else {
                 fetchServer(`/users/${partnerId}`, (result, error, status) => {
                     if(error) {
-                        alert(`שגיאה${stat}: טעינת פרטי השותף של הצ'אט ${partnerId} נכשלה`);
+                        alert(`שגיאה${stat||''}: טעינת פרטי השותף של הצ'אט ${partnerId} נכשלה`);
                     } else {
                         const {username, fullname, email, phone} = result
                         addChat({...res, username, fullname, email
@@ -155,13 +155,13 @@ function Whatsapp() {
 
         fetchServer(`/groups?userId=${user.id}`, (result, error, status) => {
             if(error) {
-                alert(`שגיאה${status}: הבאת קבוצות המשתמש נכשלה`);
+                alert(`שגיאה${status||''}: הבאת קבוצות המשתמש נכשלה`);
             } else {
                 setGroups(result);
                 result.forEach(group =>socket.emit('join_room', `group${group.id}`));
                 fetchServer(`/chats?userId=${user.id}`, (res, error, status) => {
                     if(error) {
-                        alert(`שגיאה${status}: הבאת צ'אטים של המשתמש נכשלה`);
+                        alert(`שגיאה${status||''}: הבאת צ'אטים של המשתמש נכשלה`);
                     } else {
                         res.forEach(chat => getChatMessages(chat, result, getChatInfo));
                     }

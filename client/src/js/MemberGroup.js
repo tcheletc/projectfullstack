@@ -5,7 +5,7 @@ function MemberGroup({user, me, admin, displayRemoveUserFromGroup, displayChange
     const toggleAdmin = () => {
         fetchServer(`/groups/${groupId}/users/${user.id}`, (res, err, stat) => {
             if(err) {
-                alert(`שגיאה${stat}: עדכון המשתמש ${user.fullname} בקבוצה נכשלה`);
+                alert(`שגיאה${stat||''}: עדכון המשתמש ${user.fullname} בקבוצה נכשלה`);
             } else {
                 displayChangeAdminUserInGroup();
             }
@@ -16,7 +16,7 @@ function MemberGroup({user, me, admin, displayRemoveUserFromGroup, displayChange
     const removeFromGroup = () => {
         fetchServer(`/groups/${groupId}/users/${user.id}`, (res, err, stat) => {
             if(err) {
-                alert(`שגיאה${stat}: הסרת המשתמש ${user.fullname} מהקבוצה נכשלה`);
+                alert(`שגיאה${stat||''}: הסרת המשתמש ${user.fullname} מהקבוצה נכשלה`);
             } else {
                 displayRemoveUserFromGroup();
             }

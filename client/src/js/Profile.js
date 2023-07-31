@@ -48,7 +48,7 @@ function Profile({user, goBack, updateProfile}) {
       
         fetchServer(`/passwords/${user.id}`,(res, err, stat) => {
             if(err) {
-                alert(`שגיאה${stat}: עדכון הפרופיל נכשל`);
+                alert(`שגיאה${stat||''}: עדכון הפרופיל נכשל`);
             } else {
                 alert("הסיסמא השתנתה בהצלחה!");
                 const updatedUser = { ...user, password_: newPassword };
@@ -74,7 +74,7 @@ function Profile({user, goBack, updateProfile}) {
     const handleSave = (field) => {
         fetchServer(`/users/${user.id}`,(res, error, status) => {
             if(error) {
-                alert(`שגיאה${status}: עדכון הפרופיל נכשל`);
+                alert(`שגיאה${status||''}: עדכון הפרופיל נכשל`);
             } else {
                 const updatedUser = { ...user, [field]: updatedFields[field] };
                 sessionStorage.setItem('user', JSON.stringify(updatedUser));

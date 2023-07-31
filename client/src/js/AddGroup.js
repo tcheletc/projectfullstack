@@ -36,7 +36,7 @@ function AddGroup({goBack, userId, username, displayGroup, user}) {
                     if(stat === 404) {
                         alert(`שם המשתמש ${lastUser.username} לא קיים במערכת`);
                     } else {
-                        alert(`שגיאה${stat}: מציאת המשתמש ${lastUser.username} נכשלה`);
+                        alert(`שגיאה${stat||''}: מציאת המשתמש ${lastUser.username} נכשלה`);
                     }
                 } else {
                     setUsers(prevUsers => prevUsers.slice(0, -1).concat([res, {username: ''}]));
@@ -54,14 +54,13 @@ function AddGroup({goBack, userId, username, displayGroup, user}) {
     const createGroup = (users) => {
         fetchServer(`/groups`, (res, err, stat) => {
             if(err) {
-                alert(`שגיאה${stat}: יצירת הקבוצה נכשלה`);
+                alert(`שגיאה${stat||''}: יצירת הקבוצה נכשלה`);
             } else {
                 //ADD group to display
                 displayGroup({name_, 
                     users: users.map(u => ({...u, is_admin: false})).concat([{...user, is_admin: true}])
                     , id: res.id});
-                setName('');
-                setUsers([{username: ''}]);
+                handleGoBack();
             }
         }, 'POST', 
         JSON.stringify({name_, users: users.map(u => u.id), userId}),
@@ -85,7 +84,7 @@ function AddGroup({goBack, userId, username, displayGroup, user}) {
                     if(stat === 404) {
                         alert(`שם המשתמש ${lastUser.username} לא קיים במערכת`);
                     } else {
-                        alert(`שגיאה${stat}: מציאת המשתמש ${lastUser.username} נכשלה`);
+                        alert(`שגיאה${stat||''}: מציאת המשתמש ${lastUser.username} נכשלה`);
                     }
                 } else {
                     const allUsers = users.slice(0, -1).concat([res]);

@@ -18,17 +18,18 @@ function ChatDisplay({chat, group, addToDisplay, sendMessage, display, setAllMes
     const [onBottom, setOnBottom] = useState(false);
     const ref = useRef(null);
     const refNewMsg = useRef(null);
+    const prevChatId = useRef(0);
 
     const scrollToLastMessage = () => {
         const lastChildElement = ref.current?.lastElementChild;
-        lastChildElement?.scrollIntoView(/* { behavior: 'smooth' } */);
+        lastChildElement?.scrollIntoView();
     };
 
     const getNextMessages = (callback = () => {}) => {
         fetchServer(`/messages?chatId=${chat.id}&reverse=true&limit=20&offset=${chat.messages.length}`,
         (result, error, status) => {
             if(error) {
-                alert(`שגיאה${status}: טעינת המשך הודעות הצ'אט נכשלה`);
+                alert(`שגיאה${status||''}: טעינת המשך הודעות הצ'אט נכשלה`);
             } else {
                 display(result.reverse().concat(chat.messages));
                 if(result.length < 20) {
@@ -43,11 +44,13 @@ function ChatDisplay({chat, group, addToDisplay, sendMessage, display, setAllMes
         fetchServer(`/chats/${chat.id}/read`,
         (result, error, status) => {
             if(error) {
-                alert(`שגיאה${status}: סימון הודעות הצ'אט כנקראו נכשל`);
+                alert(`שגיאה${status||''}: סימון הודעות הצ'אט כנקראו נכשל`);
             } else {
                 display(chat.messages.map(m => ({...m, is_read: true})));
                 if(stayState) {
                     setIndexNew(prevIndex);
+                } else {
+                    setIndexNew(-1);
                 }
             }
         }, 'PUT');
@@ -56,7 +59,7 @@ function ChatDisplay({chat, group, addToDisplay, sendMessage, display, setAllMes
     const getUsersGroup = () => {
         fetchServer(`/groups/${group.id}/users`, (res, err, stat) => {
             if(err) {
-                alert(`שגיאה${stat}: טעינת משתמשי הקבוצה נכשלה`);
+                alert(`שגיאה${stat||''}: טעינת משתמשי הקבוצה נכשלה`);
             } else {
                 setUsersGroup(group.id, res);
             }
@@ -65,24 +68,15 @@ function ChatDisplay({chat, group, addToDisplay, sendMessage, display, setAllMes
 
     useEffect(() => {
         if(chat?.groupId && group && !group.users) {
-            console.log('get users group');
             getUsersGroup();
         }
     }, [chat?.groupId, group]);
 
     useEffect(() => {
-        setStartMessages(chat?.messages?.length);
-        const index = chat?.messages?.findIndex(m => !m.is_read);
-        setIndexNew(index);
-        if( index > -1) {
-            setOnBottom(false);
-            refNewMsg?.current?.scrollIntoView();
-            readMessages(true, index);
-        } else {
-            setOnBottom(true);
-            scrollToLastMessage();
+        if(group?.users) {
+            ref?.current?.scrollTo({top: ref.current.scrollHeight - scroll});
         }
-    }, [chat?.id]);
+    }, [group?.users]);
 
     useEffect(() => {
         if(chat && chat.messages.length < 20 && !chat.allMessages) {
@@ -94,22 +88,40 @@ function ChatDisplay({chat, group, addToDisplay, sendMessage, display, setAllMes
 
     useEffect(() => {
         if(chat) {
-            const index = chat.messages.findIndex(m => !m.is_read);
-            setIndexNew(index);
-            if(index > -1) {
-                if(onBottom && startMessages !== chat.messages.length) {
-                    readMessages();
-                } else {
+            if(chat.id !== prevChatId.current) {
+                setStartMessages(chat?.messages?.length);
+                const index = chat?.messages?.findIndex(m => !m.is_read);
+                setIndexNew(index);
+                if( index > -1) {
+                    setOnBottom(false);
+                    refNewMsg?.current?.scrollIntoView();
                     readMessages(true, index);
+                } else {
+                    setOnBottom(true);
+                    scrollToLastMessage();
+                }
+            } else {
+                const index = chat.messages.findIndex(m => !m.is_read);
+                setIndexNew(index);
+                if(index > -1  && startMessages !== chat.messages.length) {
+                    if(onBottom) {
+                        readMessages();
+                    } else {
+                        readMessages(true, index);
+                    }
+                }
+                if(onBottom) {
+                    scrollToLastMessage();
+                } else {
+                    ref?.current?.scrollTo({top: ref.current.scrollHeight - scroll});
                 }
             }
-            if(onBottom) {
-                scrollToLastMessage();
-            } else {
-                ref?.current?.scrollTo({top: ref.current.scrollHeight - scroll});
-            }
         }
-    }, [chat?.messages?.length]);
+    }, [chat?.messages?.length, chat?.id]);
+
+    useEffect(() => {
+        prevChatId.current = chat?.id;
+    }, [chat?.id]);
 
     useEffect(() => {
         if(!fullDesc) {
@@ -120,7 +132,7 @@ function ChatDisplay({chat, group, addToDisplay, sendMessage, display, setAllMes
 
     const handleScroll = (e) => {
         setScroll(e.currentTarget.scrollHeight - e.currentTarget.scrollTop);
-        if(e.currentTarget.scrollHeight === e.currentTarget.scrollTop) {
+        if(e.currentTarget.scrollHeight - e.currentTarget.clientHeight === e.currentTarget.scrollTop) {
             setOnBottom(true);
         } else {
             setOnBottom(false);
@@ -140,7 +152,7 @@ function ChatDisplay({chat, group, addToDisplay, sendMessage, display, setAllMes
             else body = {...body, groupId};
             fetchServer('/messages', (result, error, status) => {
                 if(error) {
-                    alert(`שגיאה${status}: הוספת ההודעה נכשלה`);
+                    alert(`שגיאה${status||''}: הוספת ההודעה נכשלה`);
                 } else {
                     sendMessage({text_, senderId: userId, id: result.id, groupId: chat.groupId});
                     addToDisplay({...body, id: result.id, is_read: true});  

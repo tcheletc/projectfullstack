@@ -31,7 +31,7 @@ function Registration() {
         if(err) {
           if(err.error?.code === 'ER_DUP_ENTRY')
             setErr('שם המשתמש כבר קיים במערכת');
-          else setErr(`שגיאה${status}: ההרשמה נכשלה: ${err.error?.code || err.error || err}`);
+          else setErr(`שגיאה${status||''}: ההרשמה נכשלה: ${err.error?.code || err.error || err}`);
         } else {
           setErr('');
           history('/login');

@@ -21,6 +21,7 @@ function NavChats({user, chats, selectedChatId, addToDisplay, selectChat,
         if(chats.some(chat => chat.username === username)) {
             let chat = chats.find(c => c.username === username);
             selectChat(chat.id);
+            setUsername('');
         } else {
             fetchServer(`/users?username=${username}&limit=1`, (result, error, status) => {
             if(error) {
@@ -36,6 +37,7 @@ function NavChats({user, chats, selectedChatId, addToDisplay, selectChat,
                     } else {
                         addToDisplay({...body, id: result.id, groupId: null,
                             fullname, username, email, phone, messages: []});
+                            setUsername('');
                     }
                 }, 'POST', JSON.stringify(body), { 'Content-Type': 'application/json'});
             }
