@@ -103,8 +103,8 @@ function ChatDisplay({chat, group, addToDisplay, sendMessage, display, setAllMes
             } else {
                 const index = chat.messages.findIndex(m => !m.is_read);
                 setIndexNew(index);
-                if(index > -1  && startMessages !== chat.messages.length) {
-                    if(onBottom) {
+                if(index > -1) {
+                    if(onBottom  && startMessages !== chat.messages.length) {
                         readMessages();
                     } else {
                         readMessages(true, index);

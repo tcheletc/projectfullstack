@@ -45,7 +45,7 @@ function ChatDetails({chat, goBack, users, userId, displayRemoveUserFromGroup,
                     <h4>חברי הקבוצה</h4>
                     <div className='members'>
                     <div className='group-members'>
-                    {users.map(u => <MemberGroup key={u.id} user={u} me={u.id === userId} groupId={chat?.groupId}
+                    {users?.map(u => <MemberGroup key={u.id} user={u} me={u.id === userId} groupId={chat?.groupId}
                     displayRemoveUserFromGroup={() => displayRemoveUserFromGroup(u.id)}
                     displayChangeAdminUserInGroup={() => displayChangeAdminUserInGroup(u.id)} admin={admin} />)}
                     </div>

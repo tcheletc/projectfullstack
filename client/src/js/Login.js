@@ -25,6 +25,7 @@ function Login() {
             setErr('');
             sessionStorage.setItem('user', JSON.stringify(user));
             history(`/users/${user.username}`);
+            document.title = user.fullname;
           }
           setLoading(false);
       }, 'POST', JSON.stringify({ username, password_ : password }),

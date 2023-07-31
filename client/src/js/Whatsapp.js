@@ -57,7 +57,7 @@ function Whatsapp() {
 
     const changeAdminUserInGroup = (groupId, userId) => {
         setGroups(groups => groups.map(group => group.id === groupId?
-            {...group, users: group.users.map(user => user.id === userId ? 
+            {...group, users: group.users?.map(user => user.id === userId ? 
                 {...user, is_admin: !user.is_admin}: user)} : group));
     }
 
@@ -132,7 +132,7 @@ function Whatsapp() {
                     } else {
                         const {username, fullname, email, phone} = result
                         addChat({...res, username, fullname, email
-                            ,phone , messages: [{...message, chatId: res.id}]});
+                            ,phone , messages: [{...message, chatId: res.id}], allMessages: true});
                     }
                 });
             }
@@ -201,10 +201,8 @@ function Whatsapp() {
 
         socket.on('del_message', message => {
             let chat;
-            console.log('delete:', message)
             if(!message.groupId) {
                 chat = chats.find(c => c.partnerId === message.senderId);
-                console.log(chat);
             } else {
                 chat = chats.find(c => c.groupId === message.groupId);
             }

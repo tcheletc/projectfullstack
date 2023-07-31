@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Joi = require('joi');
-const {getAllObjects, getObjectById, executeQuery, updateObjectById, deleteObjectById, createObject} = require('../mySQLconnection');
+const {getAllObjects, getObjectById, executeQuery} = require('../mySQLconnection');
 
 router.get('/', (req, res) => {
     const schema = Joi.object({
